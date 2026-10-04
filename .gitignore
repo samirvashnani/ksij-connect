@@ -1,0 +1,19 @@
+# Local secrets / machine-specific files
+config.php
+.env
+*.local.php
+
+# Keep planning and task documents local.
+*.md
+docs/
+
+# Runtime uploads and generated files
+uploads/
+tmp/
+*.log
+
+# OS/editor noise
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
