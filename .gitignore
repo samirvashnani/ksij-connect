@@ -9,6 +9,7 @@ docs/
 
 # Runtime uploads and generated files
 uploads/
+assets/project_images/
 tmp/
 *.log
 

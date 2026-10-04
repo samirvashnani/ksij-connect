@@ -8,7 +8,7 @@ function requireMember(): array
         redirectTo('public/login.php');
     }
     require_once __DIR__ . '/db.php';
-    $statement = getDb()->prepare('SELECT * FROM members WHERE id = ?');
+    $statement = getDb()->prepare('SELECT id, membership_id, full_name, area, membership_status FROM members WHERE id = ?');
     $statement->execute([$id]);
     $member = $statement->fetch();
     if (!$member) {

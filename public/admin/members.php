@@ -11,7 +11,7 @@ $editId = isset($_GET['edit']) ? (int) $_GET['edit'] : 0;
 $record = null;
 
 if ($editId > 0) {
-    $stmt = $pdo->prepare('SELECT * FROM members WHERE id = ?');
+    $stmt = $pdo->prepare('SELECT id, membership_id, full_name, email, phone, area, membership_status, fees_due, fees_last_paid_date, renewal_date, payment_link FROM members WHERE id = ?');
     $stmt->execute([$editId]);
     $record = $stmt->fetch();
 }
@@ -40,7 +40,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'fees_last_paid_date' => $_POST['fees_last_paid_date'] ?? null,
             'renewal_date' => $_POST['renewal_date'] ?? null,
             'payment_link' => trim((string) ($_POST['payment_link'] ?? '')),
-            'wallet_balance' => (float) ($_POST['wallet_balance'] ?? 0),
         ];
 
         if ($data['membership_id'] === '' || $data['full_name'] === '' || $data['email'] === '') {
@@ -48,12 +47,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } else {
             $id = (int) ($_POST['id'] ?? 0);
             if ($id > 0) {
-                $stmt = $pdo->prepare('UPDATE members SET membership_id = ?, full_name = ?, email = ?, phone = ?, area = ?, membership_status = ?, fees_due = ?, fees_last_paid_date = ?, renewal_date = ?, payment_link = ?, wallet_balance = ? WHERE id = ?');
-                $stmt->execute([$data['membership_id'], $data['full_name'], $data['email'], $data['phone'], $data['area'], $data['membership_status'], $data['fees_due'], $data['fees_last_paid_date'], $data['renewal_date'], $data['payment_link'], $data['wallet_balance'], $id]);
+                $stmt = $pdo->prepare('UPDATE members SET membership_id = ?, full_name = ?, email = ?, phone = ?, area = ?, membership_status = ?, fees_due = ?, fees_last_paid_date = ?, renewal_date = ?, payment_link = ? WHERE id = ?');
+                $stmt->execute([$data['membership_id'], $data['full_name'], $data['email'], $data['phone'], $data['area'], $data['membership_status'], $data['fees_due'], $data['fees_last_paid_date'], $data['renewal_date'], $data['payment_link'], $id]);
                 $success = 'Member updated.';
             } else {
-                $stmt = $pdo->prepare('INSERT INTO members (membership_id, full_name, email, phone, area, membership_status, fees_due, fees_last_paid_date, renewal_date, payment_link, wallet_balance) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)');
-                $stmt->execute([$data['membership_id'], $data['full_name'], $data['email'], $data['phone'], $data['area'], $data['membership_status'], $data['fees_due'], $data['fees_last_paid_date'], $data['renewal_date'], $data['payment_link'], $data['wallet_balance']]);
+                $stmt = $pdo->prepare('INSERT INTO members (membership_id, full_name, email, phone, area, membership_status, fees_due, fees_last_paid_date, renewal_date, payment_link) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)');
+                $stmt->execute([$data['membership_id'], $data['full_name'], $data['email'], $data['phone'], $data['area'], $data['membership_status'], $data['fees_due'], $data['fees_last_paid_date'], $data['renewal_date'], $data['payment_link']]);
                 $success = 'Member created.';
             }
         }
@@ -61,7 +60,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 adminRedirectAfterSuccess('public/admin/members.php', $success);
-$rows = $pdo->query('SELECT * FROM members ORDER BY id DESC')->fetchAll();
+$rows = $pdo->query('SELECT id, membership_id, full_name, area FROM members ORDER BY id DESC')->fetchAll();
 
 adminPageStart('Members', $staff);
 renderAdminMessages($success, $error);
@@ -88,10 +87,7 @@ renderAdminMessages($success, $error);
                 <label>Email<input type="email" name="email" value="<?= escapeHtml((string) ($record['email'] ?? '')) ?>" required></label>
                 <label>Phone<input name="phone" value="<?= escapeHtml((string) ($record['phone'] ?? '')) ?>"></label>
             </div>
-            <div class="two-field-row">
-                <label>Area<input name="area" value="<?= escapeHtml((string) ($record['area'] ?? '')) ?>"></label>
-                <label>Wallet balance<input step="0.01" type="number" name="wallet_balance" value="<?= escapeHtml((string) ($record['wallet_balance'] ?? '0')) ?>"></label>
-            </div>
+            <label>Area<input name="area" value="<?= escapeHtml((string) ($record['area'] ?? '')) ?>"></label>
             <div class="two-field-row">
                 <label>Fees due<input step="0.01" type="number" name="fees_due" value="<?= escapeHtml((string) ($record['fees_due'] ?? '0')) ?>"></label>
                 <label>Payment link<input name="payment_link" value="<?= escapeHtml((string) ($record['payment_link'] ?? '')) ?>"></label>
@@ -108,14 +104,13 @@ renderAdminMessages($success, $error);
         <h2>Member list</h2>
         <div class="table-wrap">
             <table class="data-table">
-                <thead><tr><th>ID</th><th>Name</th><th>Area</th><th>Wallet</th><th>Action</th></tr></thead>
+                <thead><tr><th>ID</th><th>Name</th><th>Area</th><th>Action</th></tr></thead>
                 <tbody>
                     <?php foreach ($rows as $row): ?>
                         <tr>
                             <td><?= escapeHtml($row['membership_id']) ?></td>
                             <td><?= escapeHtml($row['full_name']) ?></td>
                             <td><?= escapeHtml($row['area'] ?: '—') ?></td>
-                            <td><?= escapeHtml(formatMoney($row['wallet_balance'])) ?></td>
                             <td class="row-actions">
                                 <a href="<?= escapeHtml(appUrl('public/admin/members.php?edit=' . (int) $row['id'])) ?>">Edit</a>
                                 <form method="post" onsubmit="return confirm('Delete this member?');">

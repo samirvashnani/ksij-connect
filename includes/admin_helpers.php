@@ -17,8 +17,7 @@ function adminNav(): void
         ['label' => 'Staff', 'path' => 'public/admin/staff_users.php'],
         ['label' => 'Requests', 'path' => 'public/admin/requests_overview.php'],
         ['label' => 'Help Assign', 'path' => 'public/admin/help_requests_assign.php'],
-        ['label' => 'Funds', 'path' => 'public/admin/funds_approval.php'],
-        ['label' => 'Wallet Credit', 'path' => 'public/admin/credit_wallet.php'],
+        ['label' => 'Projects', 'path' => 'public/admin/projects.php'],
     ];
 
     echo '<nav class="admin-nav" aria-label="Admin navigation">';

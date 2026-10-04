@@ -20,16 +20,15 @@ CREATE TABLE members (
     fees_last_paid_date DATE,
     renewal_date DATE,
     payment_link VARCHAR(255),
-    wallet_balance DECIMAL(10,2) DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-INSERT INTO members (membership_id, full_name, email, phone, area, membership_status, fees_due, fees_last_paid_date, renewal_date, payment_link, wallet_balance) VALUES
-('KSIJ001', 'Ali Raza',      'ali.raza.test@gmail.com',      '9876543210', 'Mumbai',  'active',  0.00,    '2026-03-15', '2027-03-15', 'https://pay.example.com/ksij001', 1000.00),
-('KSIJ002', 'Fatima Zahra',  'fatima.zahra.test@gmail.com',  '9876543211', 'Mumbai',  'pending', 500.00,  '2025-02-10', '2026-02-10', 'https://pay.example.com/ksij002', 200.00),
-('KSIJ003', 'Hasan Abidi',   'hasan.abidi.test@gmail.com',   '9876543212', 'Palghar', 'pending', 1200.00, '2024-12-01', '2025-12-01', 'https://pay.example.com/ksij003', 0.00),
-('KSIJ004', 'Zainab Kazmi',  'zainab.kazmi.test@gmail.com',  '9876543213', 'Palghar', 'active',  0.00,    '2026-06-20', '2027-06-20', 'https://pay.example.com/ksij004', 500.00),
-('KSIJ005', 'Mehdi Jafferi', 'mehdi.jafferi.test@gmail.com', '9876543214', 'Palghar', 'expired', 800.00,  '2024-05-05', '2025-05-05', 'https://pay.example.com/ksij005', 0.00);
+INSERT INTO members (membership_id, full_name, email, phone, area, membership_status, fees_due, fees_last_paid_date, renewal_date, payment_link) VALUES
+('KSIJ001', 'Ali Raza',      'ali.raza.test@gmail.com',      '9876543210', 'Mumbai',  'active',  0.00,    '2026-03-15', '2027-03-15', 'https://pay.example.com/ksij001'),
+('KSIJ002', 'Fatima Zahra',  'fatima.zahra.test@gmail.com',  '9876543211', 'Mumbai',  'pending', 500.00,  '2025-02-10', '2026-02-10', 'https://pay.example.com/ksij002'),
+('KSIJ003', 'Hasan Abidi',   'hasan.abidi.test@gmail.com',   '9876543212', 'Palghar', 'pending', 1200.00, '2024-12-01', '2025-12-01', 'https://pay.example.com/ksij003'),
+('KSIJ004', 'Zainab Kazmi',  'zainab.kazmi.test@gmail.com',  '9876543213', 'Palghar', 'active',  0.00,    '2026-06-20', '2027-06-20', 'https://pay.example.com/ksij004'),
+('KSIJ005', 'Mehdi Jafferi', 'mehdi.jafferi.test@gmail.com', '9876543214', 'Palghar', 'expired', 800.00,  '2024-05-05', '2025-05-05', 'https://pay.example.com/ksij005');
 
 -- ============================================================
 -- OTP VERIFICATION
@@ -85,14 +84,17 @@ CREATE TABLE projects (
     name VARCHAR(150) NOT NULL,
     status ENUM('upcoming','ongoing','completed') NOT NULL,
     description TEXT,
+    quote TEXT,
+    image_path VARCHAR(255),
+    is_active TINYINT(1) NOT NULL DEFAULT 0,
     start_date DATE,
     end_date DATE
 );
 
-INSERT INTO projects (name, status, description, start_date, end_date) VALUES
-('Community Health Camp', 'completed', 'Free medical checkup camp covering general health, eye checkups, and diabetes screening.', '2026-01-10', '2026-01-12'),
-('Digital Literacy Program', 'ongoing', 'Free smartphone/internet classes for senior citizens and homemakers.', '2026-08-01', '2026-12-31'),
-('New Community Hall Construction', 'upcoming', 'Construction of a new multi-purpose community hall.', '2027-01-01', '2027-12-31');
+INSERT INTO projects (name, status, description, start_date, end_date, is_active) VALUES
+('Community Health Camp', 'completed', 'Free medical checkup camp covering general health, eye checkups, and diabetes screening.', '2026-01-10', '2026-01-12', 0),
+('Digital Literacy Program', 'ongoing', 'Free smartphone/internet classes for senior citizens and homemakers.', '2026-08-01', '2026-12-31', 0),
+('New Community Hall Construction', 'upcoming', 'Construction of a new multi-purpose community hall.', '2027-01-01', '2027-12-31', 0);
 
 -- ============================================================
 -- SCHOLARSHIPS
@@ -271,67 +273,6 @@ CREATE TABLE help_requests (
 INSERT INTO help_requests (member_id, category, description, status)
 SELECT id, 'elderly_help', 'Need someone to accompany an elderly parent to a hospital appointment next week.', 'open'
 FROM members WHERE membership_id = 'KSIJ004';
-
--- ============================================================
--- FUNDS & DONATIONS
--- Anonymity rule: enforced by query design, not encryption —
--- any donor/public-facing SELECT must exclude member_id/donor_member_id.
--- ============================================================
-CREATE TABLE funds (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    request_id INT,
-    member_id INT NOT NULL,
-    title VARCHAR(150) NOT NULL,
-    reason TEXT,
-    purpose ENUM('medical') NULL DEFAULT NULL,
-    medical_details TEXT,
-    amount_needed DECIMAL(10,2) NOT NULL,
-    amount_raised DECIMAL(10,2) DEFAULT 0,
-    due_date DATE,
-    status ENUM('pending_approval','active','completed') DEFAULT 'pending_approval',
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (member_id) REFERENCES members(id)
-);
-
-INSERT INTO funds (member_id, title, reason, amount_needed, amount_raised, due_date, status)
-SELECT id, 'Urgent Surgery Support', 'Community member requires emergency surgery and has requested community support.', 300000.00, 45000.00, '2026-11-15', 'active'
-FROM members WHERE membership_id = 'KSIJ003';
-
-CREATE TABLE fund_documents (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    fund_id INT NOT NULL,
-    document_type ENUM('medical_report','treatment_plan','cost_estimate','other') NOT NULL,
-    original_name VARCHAR(255) NOT NULL,
-    stored_path VARCHAR(255) NOT NULL,
-    mime_type VARCHAR(50) NOT NULL,
-    file_size INT UNSIGNED NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    INDEX idx_fund_documents_fund_type (fund_id, document_type),
-    CONSTRAINT fk_fund_documents_fund FOREIGN KEY (fund_id) REFERENCES funds(id) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
-CREATE TABLE donations (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    fund_id INT NOT NULL,
-    donor_member_id INT NOT NULL,
-    amount DECIMAL(10,2) NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (fund_id) REFERENCES funds(id),
-    FOREIGN KEY (donor_member_id) REFERENCES members(id)
-);
-
-CREATE TABLE wallet_transactions (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    member_id INT NOT NULL,
-    type ENUM('credit','debit') NOT NULL,
-    amount DECIMAL(10,2) NOT NULL,
-    reference VARCHAR(150),
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (member_id) REFERENCES members(id)
-);
-
-INSERT INTO wallet_transactions (member_id, type, amount, reference)
-SELECT id, 'credit', 1000.00, 'Office credit - Sukha deposit' FROM members WHERE membership_id = 'KSIJ001';
 
 -- ============================================================
 -- NOTIFICATIONS (in-app only — NOT email, see Phase 2 notes below)

@@ -10,11 +10,11 @@ $overview = [
     'members' => (int) $pdo->query('SELECT COUNT(*) FROM members')->fetchColumn(),
     'pending_fees' => (int) $pdo->query('SELECT COUNT(*) FROM members WHERE fees_due > 0')->fetchColumn(),
     'open_help' => (int) $pdo->query("SELECT COUNT(*) FROM help_requests WHERE status = 'open'")->fetchColumn(),
-    'pending_funds' => (int) $pdo->query("SELECT COUNT(*) FROM funds WHERE status = 'pending_approval'")->fetchColumn(),
+    'active_projects' => (int) $pdo->query('SELECT COUNT(*) FROM projects WHERE is_active = 1')->fetchColumn(),
     'pending_requests' => (int) $pdo->query("SELECT COUNT(*) FROM requests WHERE office_status = 'pending'")->fetchColumn(),
 ];
 
-$context = getAdminContext('pending fees, funds approval, and open help requests');
+$context = getAdminContext('pending fees, active projects, and open help requests');
 
 adminPageStart('dashboard', $staff);
 ?>
@@ -22,7 +22,7 @@ adminPageStart('dashboard', $staff);
     <div class="stat-card"><span class="stat-label">Total Members</span><strong><?= escapeHtml((string) $overview['members']) ?></strong></div>
     <div class="stat-card"><span class="stat-label">Pending Fees</span><strong><?= escapeHtml((string) $overview['pending_fees']) ?></strong></div>
     <div class="stat-card"><span class="stat-label">Open Help Requests</span><strong><?= escapeHtml((string) $overview['open_help']) ?></strong></div>
-    <div class="stat-card"><span class="stat-label">Funds Pending</span><strong><?= escapeHtml((string) $overview['pending_funds']) ?></strong></div>
+    <div class="stat-card"><span class="stat-label">Active Projects</span><strong><?= escapeHtml((string) $overview['active_projects']) ?></strong></div>
     <div class="stat-card"><span class="stat-label">Pending Office Requests</span><strong><?= escapeHtml((string) $overview['pending_requests']) ?></strong></div>
 </div>
 
@@ -46,7 +46,7 @@ adminPageStart('dashboard', $staff);
             <a class="tool-link" href="<?= escapeHtml(appUrl('public/admin/members.php')) ?>">Manage Members</a>
             <a class="tool-link" href="<?= escapeHtml(appUrl('public/admin/staff_users.php')) ?>">Manage Staff</a>
             <a class="tool-link" href="<?= escapeHtml(appUrl('public/admin/requests_overview.php')) ?>">Review Requests</a>
-            <a class="tool-link" href="<?= escapeHtml(appUrl('public/admin/funds_approval.php')) ?>">Approve Funds</a>
+            <a class="tool-link" href="<?= escapeHtml(appUrl('public/admin/projects.php')) ?>">Manage Projects</a>
             <a class="tool-link" href="<?= escapeHtml(appUrl('public/admin/help_requests_assign.php')) ?>">Assign Help Requests</a>
         </div>
     </section>
