@@ -2,6 +2,52 @@
 require_once __DIR__ . '/db.php';
 require_once __DIR__ . '/money.php';
 
+function donationCategories(): array
+{
+    return ['health'=>'Healthcare', 'education'=>'Education', 'food'=>'Food & essentials',
+        'welfare'=>'Family welfare', 'emergency'=>'Emergency relief', 'community'=>'Community development', 'other'=>'Other'];
+}
+
+function donationHasCategoryColumn(): bool
+{
+    static $available = null;
+    if ($available !== null) { return $available; }
+    try {
+        getDb()->query('SELECT category FROM donation_projects LIMIT 0');
+        $available = true;
+    } catch (PDOException $e) {
+        // Only an absent column is compatible with the old donation schema.
+        if ((int) ($e->errorInfo[1] ?? 0) !== 1054) { throw $e; }
+        $available = false;
+    }
+    return $available;
+}
+
+function donationCategorySql(): string
+{
+    return donationHasCategoryColumn()
+        ? "CASE WHEN j.category IN ('health','education','food','welfare','emergency','community') THEN j.category ELSE 'other' END"
+        : "'other'";
+}
+
+function donationReadError(Throwable $exception, string $context): string
+{
+    $code = $exception instanceof PDOException
+        ? (string) $exception->getCode() . '/' . (int) ($exception->errorInfo[1] ?? 0)
+        : get_class($exception);
+    error_log($context . ': ' . $code);
+    return 'Donation records could not be loaded. Please share this error reference with support: ' . $code . '.';
+}
+
+function donationAdminNavigation(string $active): void
+{
+    echo '<nav class="donation-admin-nav" aria-label="Donation management">';
+    foreach (['analytics'=>'Overview','ledger'=>'Payment ledger','projects'=>'Projects'] as $key=>$label) {
+        echo '<a href="' . escapeHtml(appUrl('public/admin/donation_' . $key . '.php')) . '"' . ($active===$key ? ' aria-current="page"' : '') . '>' . $label . '</a>';
+    }
+    echo '</nav>';
+}
+
 function donationText(array $input, string $key, int $max, bool $required = true): string
 {
     $value = $input[$key] ?? '';

@@ -11,6 +11,7 @@ docs/
 # Runtime uploads and generated files
 uploads/
 tmp/
+vendor/
 *.log
 
 # OS/editor noise

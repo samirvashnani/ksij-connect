@@ -27,7 +27,7 @@ function workspaceNavigation(bool $staff, string $role, bool $guarantor = false)
     return [
         'Overview' => [['public/admin/index.php', 'Dashboard', 'layout-dashboard']],
         'Operations' => [['public/admin/requests_overview.php', 'Formal requests', 'clipboard-list'], ['public/admin/help_requests_assign.php', 'Help assignments', 'hand-heart']],
-        'Donations' => [['public/admin/donation_projects.php', 'Donation projects', 'hand-heart'], ['public/admin/donation_ledger.php', 'Payment ledger', 'clipboard-list']],
+        'Donations' => [['public/admin/donation_analytics.php', 'Donation overview', 'layout-dashboard'], ['public/admin/donation_projects.php', 'Donation projects', 'hand-heart'], ['public/admin/donation_ledger.php', 'Payment ledger', 'clipboard-list']],
         'People' => [['public/admin/members.php', 'Members', 'users'], ['public/admin/staff_users.php', 'Team accounts', 'settings']],
         'Information' => [['public/admin/events.php', 'Events', 'calendar-days'], ['public/admin/news_updates.php', 'Announcements', 'newspaper'], ['public/admin/scholarships.php', 'Scholarships', 'graduation-cap'], ['public/admin/welfare_schemes.php', 'Welfare schemes', 'hand-heart'], ['public/admin/general_info.php', 'General information', 'book-open'], ['public/admin/contacts.php', 'Contacts', 'contact']],
     ];
@@ -43,7 +43,7 @@ function pageHeader(string $title, ?array $identity = null, bool $staff = false)
     ?><!doctype html>
     <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
     <title><?= escapeHtml($title) ?> | KSIJ Connect</title>
-    <link rel="stylesheet" href="<?= escapeHtml(appUrl('assets/css/style.css?v=18')) ?>">
+    <link rel="stylesheet" href="<?= escapeHtml(appUrl('assets/css/style.css?v=19')) ?>">
     <script src="<?= escapeHtml(appUrl('assets/js/ui.js?v=3')) ?>" defer></script></head>
     <body class="<?= $identity ? 'has-sidebar' : ($authPage ? 'auth-shell' : 'public-shell') ?>"><a class="skip-link" href="#main-content">Skip to content</a>
     <header class="site-header"><div class="header-start">

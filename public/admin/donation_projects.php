@@ -7,17 +7,19 @@ header('Cache-Control: no-store');
 $error = '';
 $projects = [];
 $editId = filter_var($_GET['edit'] ?? 0, FILTER_VALIDATE_INT) ?: 0;
-$edit = ['id'=>0,'title'=>'','description'=>'','quote'=>'','is_active'=>1];
+$edit = ['id'=>0,'title'=>'','description'=>'','quote'=>'','is_active'=>1,'category'=>'other'];
 try {
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         checkCsrf();
         $editId = filter_var($_POST['id'] ?? 0, FILTER_VALIDATE_INT);
         if ($editId === false || $editId < 0) { throw new DomainException('Invalid project.'); }
         $title = donationText($_POST, 'title', 160);
+        $category = donationText($_POST, 'category', 30);
+        if (!isset(donationCategories()[$category])) { throw new DomainException('Choose a valid category.'); }
         $description = donationText($_POST, 'description', 10000);
         $quote = donationText($_POST, 'quote', 300);
         $active = ($_POST['is_active'] ?? '') === '1' ? 1 : 0;
-        $edit = ['id'=>$editId,'title'=>$title,'description'=>$description,'quote'=>$quote,'is_active'=>$active];
+        $edit = ['id'=>$editId,'title'=>$title,'description'=>$description,'quote'=>$quote,'is_active'=>$active,'category'=>$category];
         $image = null;
         $mime = null;
         $file = $_FILES['image'] ?? null;
@@ -33,18 +35,18 @@ try {
         if ($editId) {
             $s = getDb()->prepare('SELECT id FROM donation_projects WHERE id = ?'); $s->execute([$editId]);
             if (!$s->fetchColumn()) { throw new DomainException('Project not found.'); }
-            $params = [$title,$description,$quote,$active];
-            $sql = 'UPDATE donation_projects SET title=?,description=?,quote=?,is_active=?';
+            $params = [$title,$description,$quote,$active,$category];
+            $sql = 'UPDATE donation_projects SET title=?,description=?,quote=?,is_active=?,category=?';
             if ($image !== null) { $sql .= ',image_data=?,image_mime=?'; $params[]=$image; $params[]=$mime; }
             $params[]=$editId;
             getDb()->prepare($sql . ' WHERE id=?')->execute($params);
         } else {
-            getDb()->prepare('INSERT INTO donation_projects (title,description,quote,is_active,image_data,image_mime,created_by) VALUES (?,?,?,?,?,?,?)')->execute([$title,$description,$quote,$active,$image,$mime,$staff['id']]);
+            getDb()->prepare('INSERT INTO donation_projects (title,description,quote,is_active,image_data,image_mime,created_by,category) VALUES (?,?,?,?,?,?,?,?)')->execute([$title,$description,$quote,$active,$image,$mime,$staff['id'],$category]);
         }
         redirectTo('public/admin/donation_projects.php?saved=1');
     }
     if ($editId) {
-        $s = getDb()->prepare('SELECT id,title,description,quote,is_active FROM donation_projects WHERE id=?'); $s->execute([$editId]);
+        $s = getDb()->prepare('SELECT id,title,description,quote,is_active,category FROM donation_projects WHERE id=?'); $s->execute([$editId]);
         $edit = $s->fetch();
         if (!$edit) { throw new DomainException('Project not found.'); }
     }
@@ -56,9 +58,11 @@ pageHeader('Donation projects', $staff, true);
 ?>
 <section class="workspace donation-workspace"><header class="page-heading"><div><p class="eyebrow">COMMUNITY GIVING</p><h1>Donation projects</h1></div><a class="button-link button-secondary" href="<?= escapeHtml(appUrl('public/admin/donation_ledger.php')) ?>"><?= uiIcon('clipboard-list') ?>Payment ledger</a></header>
 <?php showError($error); if (isset($_GET['saved'])): ?><p class="success">Project saved.</p><?php endif; ?>
+<?php donationAdminNavigation('projects'); ?>
 <details class="donation-editor"<?= $editId || $error ? ' open' : '' ?>><summary><?= $editId ? 'Edit project' : 'New project / scheme' ?></summary>
 <form method="post" enctype="multipart/form-data" class="donation-form"><?php csrfField(); ?><input type="hidden" name="id" value="<?= (int) ($edit['id'] ?? 0) ?>">
 <label>Title<input name="title" maxlength="160" required value="<?= escapeHtml($edit['title'] ?? '') ?>"></label>
+<label>Category<select name="category" required><?php foreach (donationCategories() as $key=>$label): ?><option value="<?= $key ?>"<?= ($edit['category'] ?? 'other')===$key ? ' selected' : '' ?>><?= escapeHtml($label) ?></option><?php endforeach; ?></select></label>
 <label>Quote<input name="quote" maxlength="300" required value="<?= escapeHtml($edit['quote'] ?? '') ?>"></label>
 <label class="full-width">Description<textarea name="description" maxlength="10000" rows="5" required><?= escapeHtml($edit['description'] ?? '') ?></textarea></label>
 <label>Project image (JPG, PNG or WebP; up to 5 MB)<input type="file" name="image" accept="image/jpeg,image/png,image/webp"<?= $editId ? '' : ' required' ?>></label>

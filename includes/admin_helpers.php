@@ -17,6 +17,7 @@ function adminNav(): void
         ['label' => 'Staff', 'path' => 'public/admin/staff_users.php'],
         ['label' => 'Requests', 'path' => 'public/admin/requests_overview.php'],
         ['label' => 'Help Assign', 'path' => 'public/admin/help_requests_assign.php'],
+        ['label' => 'Donation overview', 'path' => 'public/admin/donation_analytics.php'],
         ['label' => 'Donations', 'path' => 'public/admin/donation_projects.php'],
         ['label' => 'Payment ledger', 'path' => 'public/admin/donation_ledger.php'],
     ];

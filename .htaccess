@@ -4,7 +4,11 @@ Options -Indexes
     Require all denied
 </FilesMatch>
 
-RedirectMatch 403 /(?:docs|includes|tools|uploads|jamaat-helpdesk|\.git)(?:/|$)
+RedirectMatch 403 /(?:docs|includes|tools|uploads|vendor|tmp|jamaat-helpdesk|\.git)(?:/|$)
+
+<FilesMatch "^composer\.(?:json|lock)$">
+    Require all denied
+</FilesMatch>
 
 <FilesMatch "(?i)\.local\.php$">
     Require all denied
