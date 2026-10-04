@@ -5,7 +5,6 @@ require_once __DIR__ . '/fund_documents.php';
 function memberDashboardData(int $memberId): array
 {
     $queries = [
-        'transactions' => ['SELECT id,type,amount,reference,created_at FROM wallet_transactions WHERE member_id = ? ORDER BY created_at DESC,id DESC LIMIT 5', [$memberId]],
         'requests' => ['SELECT id,type,amount_requested,guarantor1_status,guarantor2_status,office_status,created_at FROM requests WHERE member_id = ? ORDER BY created_at DESC,id DESC LIMIT 3', [$memberId]],
         'help' => ["SELECT h.id,h.category,h.description,h.created_at,m.area FROM help_requests h LEFT JOIN members m ON m.id = h.member_id WHERE h.status = 'open' ORDER BY h.created_at DESC,h.id DESC LIMIT 2", []],
         // Public previews use the same medical-document eligibility as the fund board.

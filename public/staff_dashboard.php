@@ -113,36 +113,44 @@ try {
     error_log('Team workspace lookup failed: ' . get_class($exception));
     $loadError = 'The team lists could not be loaded. Please reload the page.';
 }
-pageHeader('Team workspace', $staff, true);
+pageHeader($cc ? 'Coordination dashboard' : 'Volunteer dashboard', $staff, true);
 ?>
-<section class="workspace team-workspace" data-team-workspace data-default-panel="<?= $cc ? 'open-help' : 'assigned-tasks' ?>"><div class="team-workspace-heading"><div><p class="eyebrow"><?= $staff['role'] === 'cc_member' ? 'CC MEMBER' : 'VOLUNTEER' ?></p><h1>Team workspace</h1></div><strong><?= escapeHtml($staff['full_name']) ?></strong></div>
-<div class="team-meta"><span><?= escapeHtml(trim((string) $staff['area']) ?: 'Area not recorded') ?></span><span>Active</span><span>Guarantor: <?= $guarantor ? 'Eligible' : 'Not approved' ?></span></div>
+<section class="workspace team-workspace" data-team-workspace data-default-panel="<?= $cc ? 'open-help' : 'assigned-tasks' ?>"><header class="operations-heading"><div><p class="eyebrow"><?= $cc ? 'COMMUNITY COORDINATION' : 'VOLUNTEER OPERATIONS' ?></p><h1><?= $cc ? 'Coordination dashboard' : 'Volunteer dashboard' ?></h1><p class="operations-person">Salaam, <?= escapeHtml($staff['full_name']) ?></p></div><button type="button" class="button-secondary" data-chat-open><?= uiIcon('message-circle') ?>KSIJ Assistant</button></header>
+<div class="operations-identity"><span><?= uiIcon('users') ?><?= escapeHtml(trim((string) $staff['area']) ?: 'Area not recorded') ?></span><span class="status-badge status-approved">Active account</span><span><?= uiIcon('shield-check') ?><?= $guarantor ? 'Guarantor eligible' : 'Guarantor not approved' ?></span></div>
+<?php if (!$loadError): ?>
+<div class="operations-metrics team-metrics">
+<?php $queueMetrics = [['assigned-tasks', 'Tasks in view', 'clipboard-list', $tasks], ['open-help', 'Open help in view', 'hand-heart', $open]];
+if ($guarantor) { $queueMetrics[] = ['guarantor-reviews', 'Reviews in view', 'shield-check', $reviews]; }
+if ($cc) { $queueMetrics[] = ['volunteer-activity', 'Local volunteers in view', 'users', $activity]; }
+foreach ($queueMetrics as [$panelId, $label, $icon, $list]): ?><a class="operations-metric" href="#<?= $panelId ?>" data-team-link><span class="metric-top"><?= uiIcon($icon) ?><?= uiIcon('arrow-up-right') ?></span><strong data-team-summary="<?= $panelId ?>"><?= (int) $list['total'] ?></strong><span><?= $label ?></span></a><?php endforeach; ?>
+</div>
+<?php endif; ?>
 <nav class="team-nav" aria-label="Team sections"><a href="#assigned-tasks"><?= uiIcon('clipboard-list') ?>My tasks</a><a href="#open-help"><?= uiIcon('hand-heart') ?>Open help</a><?php if ($guarantor): ?><a href="#guarantor-reviews"><?= uiIcon('shield-check') ?>Guarantor reviews</a><?php endif; ?><?php if ($cc): ?><a href="#volunteer-activity"><?= uiIcon('users') ?>Volunteer activity</a><?php endif; ?></nav>
 <p class="team-feedback" role="status" aria-live="polite" data-team-feedback></p>
 <?php if ($success): ?><p class="success" role="status"><?= escapeHtml($success) ?></p><?php endif; ?>
 <?php showError($error); showError($loadError); ?>
 <?php if (!$loadError): ?>
-<section class="team-section" id="assigned-tasks" data-team-panel data-page="tasks_page"><div class="page-heading"><h2>My tasks</h2><span class="muted" data-team-count><?= (int) $tasks['total'] ?> tasks</span></div>
+<section class="team-section" id="assigned-tasks" data-team-panel data-page="tasks_page"><div class="page-heading"><h2>My tasks</h2><span class="muted" data-team-count data-total="<?= (int) $tasks['total'] ?>"><?= (int) $tasks['total'] ?> tasks</span></div>
 <form class="list-filters" data-team-filter method="get" action="<?= escapeHtml(appUrl('public/staff_dashboard.php')) ?>#assigned-tasks"><?php renderTeamFilterFields('task_status', 'tasks_page'); renderTeamSearch('tasks_search', $searches['tasks_search'], 'Search tasks'); ?><div><label for="task-status">Status</label><select id="task-status" name="task_status"><option value="assigned"<?= $taskStatus === 'assigned' ? ' selected' : '' ?>>Assigned</option><option value="resolved"<?= $taskStatus === 'resolved' ? ' selected' : '' ?>>Resolved</option><option value=""<?= $taskStatus === '' ? ' selected' : '' ?>>All</option></select></div><button type="submit">Apply</button></form>
 <div data-team-results>
-<?php if (!$tasks['rows']): ?><p class="muted">No tasks in this view.</p><?php endif; ?>
+<?php if (!$tasks['rows']): ?><div class="operations-empty"><?= uiIcon('clipboard-list') ?><h3>No tasks in this view</h3></div><?php endif; ?>
 <?php foreach ($tasks['rows'] as $task) { renderTeamHelpRow($task, $categories, true, null); } ?>
 <?php renderTeamPagination($tasks, 'tasks_page', 'assigned-tasks'); ?></div></section>
 
-<section class="team-section" id="open-help" data-team-panel data-page="open_page"><div class="page-heading"><h2>Open community help</h2><span class="muted" data-team-count><?= (int) $open['total'] ?> open requests</span></div>
+<section class="team-section" id="open-help" data-team-panel data-page="open_page"><div class="page-heading"><h2>Open community help</h2><span class="muted" data-team-count data-total="<?= (int) $open['total'] ?>"><?= (int) $open['total'] ?> open requests</span></div>
 <form class="list-filters" data-team-filter method="get" action="<?= escapeHtml(appUrl('public/staff_dashboard.php')) ?>#open-help"><?php renderTeamFilterFields('category', 'open_page'); renderTeamSearch('open_search', $searches['open_search'], 'Search help requests'); ?><div><label for="help-category">Category</label><select id="help-category" name="category"><option value="">All categories</option><?php foreach ($categories as $key => $label): ?><option value="<?= $key ?>"<?= $category === $key ? ' selected' : '' ?>><?= $label ?></option><?php endforeach; ?></select></div><button type="submit">Apply</button></form>
 <div data-team-results>
-<?php if (!$open['rows']): ?><p class="muted">No open help requests.</p><?php endif; ?>
+<?php if (!$open['rows']): ?><div class="operations-empty"><?= uiIcon('hand-heart') ?><h3>No open help requests</h3></div><?php endif; ?>
 <?php foreach ($open['rows'] as $task) { renderTeamHelpRow($task, $categories, false, $cc ? $volunteers : null); } ?>
 <?php renderTeamPagination($open, 'open_page', 'open-help'); ?></div></section>
 
 <?php if ($guarantor): ?>
-<section class="team-section" id="guarantor-reviews" data-team-panel data-page="reviews_page"><div class="page-heading"><h2>Guarantor reviews</h2><span class="muted" data-team-count><?= (int) $reviews['total'] ?> requests</span></div>
+<section class="team-section" id="guarantor-reviews" data-team-panel data-page="reviews_page"><div class="page-heading"><h2>Guarantor reviews</h2><span class="muted" data-team-count data-total="<?= (int) $reviews['total'] ?>"><?= (int) $reviews['total'] ?> requests</span></div>
 <form class="list-filters" data-team-filter method="get" action="<?= escapeHtml(appUrl('public/staff_dashboard.php')) ?>#guarantor-reviews"><?php renderTeamFilterFields('review', 'reviews_page'); renderTeamSearch('reviews_search', $searches['reviews_search'], 'Search member or request'); ?><div><label for="review-filter">View</label><select id="review-filter" name="review"><option value="pending"<?= $review === 'pending' ? ' selected' : '' ?>>Pending my decision</option><option value="all"<?= $review === 'all' ? ' selected' : '' ?>>All my guarantor requests</option></select></div><button type="submit">Apply</button></form>
 <div data-team-results>
-<?php if (!$reviews['rows']): ?><p class="muted">No requests in this view.</p><?php endif; ?>
+<?php if (!$reviews['rows']): ?><div class="operations-empty"><?= uiIcon('shield-check') ?><h3>No reviews in this view</h3></div><?php endif; ?>
 <?php foreach ($reviews['rows'] as $request): $slot = (int) $request['guarantor1_id'] === (int) $staff['id'] ? 1 : 2; $myStatus = $request['guarantor' . $slot . '_status']; $canDecide = $myStatus === 'pending' && $request['office_status'] === 'pending' && (int) $request['guarantor1_id'] !== (int) $request['guarantor2_id']; ?>
-<article class="request-row"><div class="request-heading"><h3><?= escapeHtml(ucfirst(str_replace('_', ' ', $request['type']))) ?> <span class="muted">#<?= (int) $request['id'] ?></span></h3><strong><?= escapeHtml(formatMoney(moneyToCents((string) ($request['amount_requested'] ?? '0'), true) ?? 0)) ?></strong></div>
+<article class="request-row team-review-row"><div class="request-heading"><h3><?= escapeHtml(ucfirst(str_replace('_', ' ', $request['type']))) ?> <span class="muted">#<?= (int) $request['id'] ?></span></h3><strong><?= escapeHtml(formatMoney(moneyToCents((string) ($request['amount_requested'] ?? '0'), true) ?? 0)) ?></strong></div>
 <p><?= escapeHtml($request['member_name']) ?> <span class="muted"><?= escapeHtml($request['membership_id']) ?> / <?= escapeHtml($request['area']) ?></span></p>
 <p class="request-description"><?= escapeHtml($request['description']) ?></p>
 <a class="document-link" href="<?= escapeHtml(appUrl('public/request_details.php?id=' . (int) $request['id'])) ?>"><?= uiIcon('folder') ?>View details and documents</a>
@@ -157,7 +165,7 @@ pageHeader('Team workspace', $staff, true);
 <?php endif; ?>
 
 <?php if ($cc): ?>
-<section class="team-section" id="volunteer-activity" data-team-panel data-page="activity_page"><div class="page-heading"><h2>Volunteer activity</h2><span class="muted" data-team-count><?= (int) $activity['total'] ?> volunteers</span></div>
+<section class="team-section" id="volunteer-activity" data-team-panel data-page="activity_page"><div class="page-heading"><h2>Volunteer activity</h2><span class="muted" data-team-count data-total="<?= (int) $activity['total'] ?>"><?= (int) $activity['total'] ?> volunteers</span></div>
 <form class="list-filters" data-team-filter method="get" action="<?= escapeHtml(appUrl('public/staff_dashboard.php')) ?>#volunteer-activity"><?php renderTeamFilterFields('', 'activity_page'); renderTeamSearch('activity_search', $searches['activity_search'], 'Search volunteer'); ?><button type="submit">Apply</button></form>
 <div data-team-results>
 <?php if (!$activity['rows']): ?><p class="muted">No volunteers are recorded in your area.</p><?php else: ?>
@@ -168,5 +176,5 @@ pageHeader('Team workspace', $staff, true);
 <?php endif; ?>
 <?php endif; ?>
 </section>
-<script src="<?= escapeHtml(appUrl('assets/js/team.js?v=2')) ?>" defer></script>
+<script src="<?= escapeHtml(appUrl('assets/js/team.js?v=3')) ?>" defer></script>
 <?php pageFooter(); ?>

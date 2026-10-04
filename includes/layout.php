@@ -11,7 +11,7 @@ function workspaceNavigation(bool $staff, string $role, bool $guarantor = false)
 {
     if (!$staff) {
         return [
-            'Workspace' => [['public/member_chat.php', 'Dashboard', 'layout-dashboard'], ['public/wallet.php', 'Wallet', 'wallet'], ['public/membership_payment.php', 'Membership fees', 'users']],
+            'Workspace' => [['public/member_chat.php', 'Dashboard', 'layout-dashboard'], ['public/membership_payment.php', 'Membership fees', 'users']],
             'Community' => [['public/my_requests.php', 'My requests', 'clipboard-list'], ['public/member_request.php', 'New request', 'file-plus'], ['public/help_requests_list.php', 'Community help', 'hand-heart']],
             'Medical support' => [['public/funds_board.php', 'Medical funds', 'heart-pulse'], ['public/fund_documents.php', 'My funds', 'folder']],
         ];
@@ -25,7 +25,7 @@ function workspaceNavigation(bool $staff, string $role, bool $guarantor = false)
     }
     return [
         'Overview' => [['public/admin/index.php', 'Dashboard', 'layout-dashboard']],
-        'Operations' => [['public/admin/requests_overview.php', 'Formal requests', 'clipboard-list'], ['public/admin/help_requests_assign.php', 'Help assignments', 'hand-heart'], ['public/admin/funds_approval.php', 'Medical funds', 'heart-pulse'], ['public/admin/credit_wallet.php', 'Wallet credits', 'wallet']],
+        'Operations' => [['public/admin/requests_overview.php', 'Formal requests', 'clipboard-list'], ['public/admin/help_requests_assign.php', 'Help assignments', 'hand-heart'], ['public/admin/funds_approval.php', 'Medical funds', 'heart-pulse']],
         'People' => [['public/admin/members.php', 'Members', 'users'], ['public/admin/staff_users.php', 'Team accounts', 'settings']],
         'Information' => [['public/admin/events.php', 'Events', 'calendar-days'], ['public/admin/news_updates.php', 'Announcements', 'newspaper'], ['public/admin/scholarships.php', 'Scholarships', 'graduation-cap'], ['public/admin/welfare_schemes.php', 'Welfare schemes', 'hand-heart'], ['public/admin/general_info.php', 'General information', 'book-open'], ['public/admin/contacts.php', 'Contacts', 'contact']],
     ];
@@ -41,8 +41,8 @@ function pageHeader(string $title, ?array $identity = null, bool $staff = false)
     ?><!doctype html>
     <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
     <title><?= escapeHtml($title) ?> | KSIJ Connect</title>
-    <link rel="stylesheet" href="<?= escapeHtml(appUrl('assets/css/style.css?v=8')) ?>">
-    <script src="<?= escapeHtml(appUrl('assets/js/ui.js')) ?>" defer></script></head>
+    <link rel="stylesheet" href="<?= escapeHtml(appUrl('assets/css/style.css?v=10')) ?>">
+    <script src="<?= escapeHtml(appUrl('assets/js/ui.js?v=2')) ?>" defer></script></head>
     <body class="<?= $identity ? 'has-sidebar' : ($authPage ? 'auth-shell' : 'public-shell') ?>"><a class="skip-link" href="#main-content">Skip to content</a>
     <header class="site-header"><div class="header-start">
     <?php if ($identity): ?><button type="button" class="icon-button navigation-toggle" aria-label="Open navigation" title="Open navigation" aria-expanded="false" aria-controls="app-sidebar" data-nav-toggle><?= uiIcon('menu') ?></button><?php endif; ?>
@@ -59,13 +59,14 @@ function pageHeader(string $title, ?array $identity = null, bool $staff = false)
     <button type="button" class="nav-backdrop" aria-label="Close navigation" data-nav-backdrop tabindex="-1"></button>
     <aside class="app-sidebar" id="app-sidebar" aria-label="Workspace navigation" tabindex="-1">
         <div class="sidebar-mobile-heading"><strong><?= escapeHtml($roleLabel) ?> workspace</strong><button type="button" class="icon-button" title="Close navigation" aria-label="Close navigation" data-nav-close><?= uiIcon('x') ?></button></div>
+        <div class="sidebar-workspace"><span class="sidebar-workspace-mark"><?= uiIcon($role === 'admin' ? 'shield-check' : ($staff ? 'hand-heart' : 'users')) ?></span><div><span>KSIJ CONNECT</span><strong><?= escapeHtml($roleLabel) ?> workspace</strong></div></div>
         <nav class="sidebar-nav" aria-label="<?= escapeHtml($roleLabel) ?> workspace">
         <?php foreach (workspaceNavigation($staff, $role, $role === 'cc_member' || !empty($identity['is_guarantor_approved'])) as $group => $links): ?><div class="nav-group"><p class="nav-group-label"><?= escapeHtml($group) ?></p>
         <?php foreach ($links as [$path, $label, $icon]): $active = strpos($path, '#') === false && str_ends_with($_SERVER['SCRIPT_NAME'] ?? '', '/' . $path); ?>
         <a class="sidebar-link<?= $active ? ' is-active' : '' ?>" href="<?= escapeHtml(appUrl($path)) ?>"<?= $active ? ' aria-current="page"' : '' ?>><?= uiIcon($icon) ?><span><?= escapeHtml($label) ?></span></a>
         <?php endforeach; ?></div><?php endforeach; ?>
         </nav>
-        <div class="sidebar-footer"><?= uiIcon('shield-check') ?><div><strong><?= escapeHtml($roleLabel) ?></strong><span><?= escapeHtml(trim((string) ($identity['area'] ?? '')) ?: 'KSIJ Community') ?></span></div></div>
+        <div class="sidebar-footer"><span class="sidebar-avatar" aria-hidden="true"><?= escapeHtml(mb_strtoupper(mb_substr($identity['full_name'], 0, 1))) ?></span><div><strong><?= escapeHtml($identity['full_name']) ?></strong><span><?= escapeHtml($roleLabel) ?></span><span><?= escapeHtml(trim((string) ($identity['area'] ?? '')) ?: 'KSIJ Community') ?></span></div></div>
     </aside>
     <?php endif; ?><main id="main-content" tabindex="-1"><?php
     if (!empty($_SESSION['notification_error'])) {

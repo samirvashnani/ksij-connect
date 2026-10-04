@@ -19,7 +19,7 @@ function renderChatPanel(string $audience, ?array $identity = null, bool $autoOp
         ['Office contacts', 'How can I contact the Jamaat office?', 'contact'],
     ];
     if ($audience === 'member') {
-        $topics = [['My wallet', 'What is my wallet balance?', 'wallet'], ['My requests', 'What is the status of my requests?', 'clipboard-list'], ['Membership fees', 'What are my membership fees due?', 'users'], ['Medical funds', 'What medical funds are available?', 'heart-pulse']];
+        $topics = [['My requests', 'What is the status of my requests?', 'clipboard-list'], ['Membership fees', 'What are my membership fees due?', 'users'], ['Medical funds', 'What medical funds are available?', 'heart-pulse']];
     } elseif (in_array($role, ['volunteer', 'cc_member'], true)) {
         $topics = [['My tasks', 'What are my assigned tasks?', 'clipboard-list'], ['Open help', 'What help requests are open and unassigned?', 'hand-heart']];
         if ($role === 'cc_member' || !empty($identity['is_guarantor_approved'])) {

@@ -93,6 +93,10 @@
             rememberDrafts(panel, excludedId);
             results.replaceChildren(...incomingResults.childNodes);
             panel.querySelector('[data-team-count]').textContent = incoming.querySelector('[data-team-count]').textContent;
+            const total = incoming.querySelector('[data-team-count]').dataset.total;
+            panel.querySelector('[data-team-count]').dataset.total = total;
+            const summary = workspace.querySelector(`[data-team-summary="${panel.id}"]`);
+            if (summary) summary.textContent = total;
             restoreDrafts(panel);
             stateUrl.searchParams.set(panel.dataset.page, results.querySelector('.pagination')?.dataset.currentPage || '1');
             // Keep each queue's search/filter state without moving focus or replacing the composer.
@@ -134,6 +138,7 @@
         });
         stateUrl.hash = wantsChat ? 'chat-heading' : selected.id;
         history.replaceState(null, '', stateUrl);
+        document.dispatchEvent(new CustomEvent('ksij:team-panel', { detail: { id: wantsChat ? 'chat-heading' : selected.id } }));
         announce('');
         if (wantsChat && reload) document.dispatchEvent(new CustomEvent('ksij:chat-open'));
         if (reload) refresh(selected);
@@ -170,8 +175,15 @@
         const apply = () => refresh(panel, currentUrl(panel, 1));
         const button = document.createElement('button');
         button.type = 'button';
-        button.className = 'button-secondary';
-        button.textContent = 'Refresh';
+        button.className = 'button-secondary team-refresh';
+        button.title = 'Refresh queue';
+        button.setAttribute('aria-label', 'Refresh queue');
+        const refreshIcon = document.createElement('img');
+        refreshIcon.src = new URL('../icons/refresh-cw.svg', document.querySelector('script[src*="assets/js/team.js"]').src).href;
+        refreshIcon.className = 'ui-icon';
+        refreshIcon.alt = '';
+        refreshIcon.setAttribute('aria-hidden', 'true');
+        button.appendChild(refreshIcon);
         button.addEventListener('click', () => refresh(panel));
         form.appendChild(button);
         form.addEventListener('submit', event => { event.preventDefault(); apply(); });
@@ -187,6 +199,12 @@
     });
 
     workspace.addEventListener('click', event => {
+        const queueLink = event.target.closest('[data-team-link]');
+        if (queueLink && !event.ctrlKey && !event.metaKey && !event.shiftKey && !event.altKey) {
+            event.preventDefault();
+            activate(queueLink.hash.slice(1));
+            return;
+        }
         const link = event.target.closest('.pagination a');
         if (!link || event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
         event.preventDefault();

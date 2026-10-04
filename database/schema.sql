@@ -34,6 +34,19 @@ INSERT INTO members (membership_id, full_name, email, phone, area, membership_st
 -- ============================================================
 -- OTP VERIFICATION
 -- ============================================================
+CREATE TABLE membership_payments (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    member_id INT NOT NULL,
+    amount DECIMAL(10,2) NOT NULL,
+    payment_mode ENUM('demo') NOT NULL DEFAULT 'demo',
+    reference VARCHAR(32) NOT NULL UNIQUE,
+    submission_token CHAR(64) NOT NULL UNIQUE,
+    paid_on DATE NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    INDEX idx_membership_payments_member (member_id, id),
+    CONSTRAINT fk_membership_payments_member FOREIGN KEY (member_id) REFERENCES members(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
 CREATE TABLE otp_verification (
     id INT AUTO_INCREMENT PRIMARY KEY,
     membership_id VARCHAR(20) NOT NULL,

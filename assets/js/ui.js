@@ -39,6 +39,23 @@
     mobile.addEventListener('change', () => update(false));
     update(false);
 
+    function highlightNavigation(panelId = '') {
+        const isTeamPage = Boolean(document.querySelector('[data-team-workspace]'));
+        const hash = panelId ? `#${panelId}` : location.hash
+            || (isTeamPage ? `#${document.querySelector('[data-team-workspace]').dataset.defaultPanel}` : '');
+        sidebar.querySelectorAll('.sidebar-link').forEach(link => {
+            const url = new URL(link.href);
+            const samePage = url.pathname === location.pathname;
+            const active = samePage && (url.hash ? url.hash === hash : !isTeamPage || !hash);
+            link.classList.toggle('is-active', active);
+            if (active) link.setAttribute('aria-current', url.hash ? 'location' : 'page');
+            else link.removeAttribute('aria-current');
+        });
+    }
+    window.addEventListener('hashchange', () => highlightNavigation());
+    document.addEventListener('ksij:team-panel', event => highlightNavigation(event.detail.id));
+    highlightNavigation();
+
     document.querySelectorAll('.notification-bell').forEach(bell => {
         document.addEventListener('click', event => { if (!bell.contains(event.target)) bell.open = false; });
         bell.addEventListener('keydown', event => {
