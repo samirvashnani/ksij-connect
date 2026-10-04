@@ -19,7 +19,7 @@ function memberAccessStart(int $step): void
 function memberAccessEnd(): void
 {
     ?>
-            <div class="member-access-footer"><a href="<?= escapeHtml(appUrl('public/team_login.php')) ?>">Volunteer / CC login <?= uiIcon('arrow-up-right') ?></a><button class="text-button" type="button" data-chat-open><?= uiIcon('circle-help') ?>Helpdesk</button></div>
+            <div class="member-access-footer"><a class="button-link button-secondary" href="<?= escapeHtml(appUrl('public/register.php')) ?>">Register <?= uiIcon('arrow-up-right') ?></a><a href="<?= escapeHtml(appUrl('public/team_login.php')) ?>">Volunteer / CC login <?= uiIcon('arrow-up-right') ?></a><button class="text-button" type="button" data-chat-open><?= uiIcon('circle-help') ?>Helpdesk</button></div>
         </div>
     </section>
     <script src="<?= escapeHtml(appUrl('assets/js/member_access.js?v=1')) ?>" defer></script>
