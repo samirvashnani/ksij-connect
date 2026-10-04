@@ -20,6 +20,19 @@ function createNotification(string $recipientType, int $recipientId, string $tit
     return (int) getDb()->lastInsertId();
 }
 
+function notifyAdminsOfNewRequest(int $requestId, string $requestType, string $memberName): void
+{
+    if ($requestId < 1 || trim($requestType) === '' || trim($memberName) === '') {
+        throw new InvalidArgumentException('A request ID, type, and member name are required.');
+    }
+
+    $admins = getDb()->query("SELECT id FROM staff_users WHERE role = 'admin' AND is_active = 1")->fetchAll(PDO::FETCH_COLUMN);
+    $message = 'New ' . $requestType . ' request #' . $requestId . ' was submitted by ' . $memberName . '.';
+    foreach ($admins as $adminId) {
+        createNotification('staff', (int) $adminId, 'New request submitted', $message);
+    }
+}
+
 function getUnreadNotifications(string $recipientType, int $recipientId): array
 {
     validateNotificationRecipient($recipientType, $recipientId);
