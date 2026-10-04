@@ -4,4 +4,4 @@ Options -Indexes
     Require all denied
 </FilesMatch>
 
-RedirectMatch 403 /(?:docs|includes|tools|\.git)(?:/|$)
+RedirectMatch 403 /(?:docs|includes|tools|uploads|\.git)(?:/|$)
