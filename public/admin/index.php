@@ -16,7 +16,7 @@ $overview = [
 
 $context = getAdminContext('pending fees, funds approval, and open help requests');
 
-adminPageStart('Admin dashboard', $staff);
+adminPageStart('dashboard', $staff);
 ?>
 <div class="stats-grid">
     <div class="stat-card"><span class="stat-label">Total Members</span><strong><?= escapeHtml((string) $overview['members']) ?></strong></div>
