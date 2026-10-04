@@ -4,5 +4,5 @@ require_once dirname(__DIR__, 2) . '/includes/layout.php';
 $staff = requireRole('admin');
 pageHeader('Admin workspace', $staff, true);
 ?>
-<section class="workspace"><p class="eyebrow">ADMINISTRATION</p><h1>Welcome, <?= escapeHtml($staff['full_name']) ?></h1><dl class="details"><div><dt>Role</dt><dd>Administrator</dd></div><div><dt>Account</dt><dd>Active</dd></div></dl></section>
+<section class="workspace"><p class="eyebrow">ADMINISTRATION</p><h1>Welcome, <?= escapeHtml($staff['full_name']) ?></h1><dl class="details"><div><dt>Role</dt><dd>Administrator</dd></div><div><dt>Account</dt><dd>Active</dd></div></dl><a class="button-link" href="<?= escapeHtml(appUrl('public/fund_documents.php')) ?>">Review medical fund documents</a></section>
 <?php pageFooter(); ?>

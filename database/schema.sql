@@ -283,6 +283,8 @@ CREATE TABLE funds (
     member_id INT NOT NULL,
     title VARCHAR(150) NOT NULL,
     reason TEXT,
+    purpose ENUM('medical') NULL DEFAULT NULL,
+    medical_details TEXT,
     amount_needed DECIMAL(10,2) NOT NULL,
     amount_raised DECIMAL(10,2) DEFAULT 0,
     due_date DATE,
@@ -294,6 +296,19 @@ CREATE TABLE funds (
 INSERT INTO funds (member_id, title, reason, amount_needed, amount_raised, due_date, status)
 SELECT id, 'Urgent Surgery Support', 'Community member requires emergency surgery and has requested community support.', 300000.00, 45000.00, '2026-11-15', 'active'
 FROM members WHERE membership_id = 'KSIJ003';
+
+CREATE TABLE fund_documents (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    fund_id INT NOT NULL,
+    document_type ENUM('medical_report','treatment_plan','cost_estimate','other') NOT NULL,
+    original_name VARCHAR(255) NOT NULL,
+    stored_path VARCHAR(255) NOT NULL,
+    mime_type VARCHAR(50) NOT NULL,
+    file_size INT UNSIGNED NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    INDEX idx_fund_documents_fund_type (fund_id, document_type),
+    CONSTRAINT fk_fund_documents_fund FOREIGN KEY (fund_id) REFERENCES funds(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE donations (
     id INT AUTO_INCREMENT PRIMARY KEY,
