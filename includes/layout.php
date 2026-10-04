@@ -17,7 +17,7 @@ function pageHeader(string $title, ?array $identity = null, bool $staff = false)
     </nav></header>
     <?php if ($identity && !$staff): ?>
     <nav class="member-nav" aria-label="Member workspace">
-        <?php foreach (['public/member_chat.php' => 'Overview', 'public/my_requests.php' => 'My requests', 'public/member_request.php' => 'New request', 'public/help_requests_list.php' => 'Help requests', 'public/help_request_new.php' => 'New help request'] as $path => $label): ?>
+        <?php foreach (['public/member_chat.php' => 'Overview', 'public/my_requests.php' => 'My requests', 'public/member_request.php' => 'New request', 'public/help_requests_list.php' => 'Help requests', 'public/help_request_new.php' => 'New help request', 'public/wallet.php' => 'Wallet', 'public/funds_board.php' => 'Medical funds', 'public/fund_documents.php' => 'My funds', 'public/raise_fund.php' => 'Raise a fund'] as $path => $label): ?>
         <a href="<?= escapeHtml(appUrl($path)) ?>"<?= str_ends_with($_SERVER['SCRIPT_NAME'] ?? '', '/' . $path) ? ' aria-current="page"' : '' ?>><?= escapeHtml($label) ?></a>
         <?php endforeach; ?>
     </nav>
