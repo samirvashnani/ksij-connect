@@ -140,7 +140,8 @@
         let saved = false;
         let message = '';
         try {
-            const response = await fetch(form.action, { method: 'POST', body, credentials: 'same-origin', signal: mutation.signal,
+            // Read the attribute because the hidden action input shadows form.action.
+            const response = await fetch(form.getAttribute('action') || window.location.href, { method: 'POST', body, credentials: 'same-origin', signal: mutation.signal,
                 headers: { 'X-Requested-With': 'XMLHttpRequest', Accept: 'application/json' } });
             if (response.redirected || !response.headers.get('Content-Type')?.includes('application/json')) {
                 throw new Error('Your session changed. Reload and check the request before trying again.');

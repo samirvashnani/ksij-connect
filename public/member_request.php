@@ -2,6 +2,8 @@
 require_once dirname(__DIR__) . '/includes/auth_member.php';
 require_once dirname(__DIR__) . '/includes/layout.php';
 $member = requireMember();
+require_once dirname(__DIR__) . '/includes/request_eligibility.php';
+requireRequestEligibility($member);
 require_once dirname(__DIR__) . '/includes/notifications.php';
 require_once dirname(__DIR__) . '/includes/request_support.php';
 $memberArea = trim((string) ($member['area'] ?? ''));
@@ -99,6 +101,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $storedPaths = [];
         try {
             $pdo->beginTransaction();
+            $lockedMember = lockRequestEligibleMember($pdo, (int) $member['id']);
+            $memberArea = trim((string) ($lockedMember['area'] ?? ''));
+            if ($memberArea === '') { throw new DomainException('Your membership has no area assigned. Please contact the office to update it.'); }
             // Lock and recheck eligibility so an approval change cannot slip past the form.
             $statement = $pdo->prepare("SELECT id FROM staff_users WHERE id IN (?, ?) AND (role = 'cc_member' OR (role = 'volunteer' AND is_guarantor_approved = 1)) AND is_active = 1 AND LOWER(TRIM(area)) = LOWER(?) ORDER BY id FOR UPDATE");
             $statement->execute([$guarantor1, $guarantor2, $memberArea]);
@@ -133,7 +138,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
             foreach ($storedPaths as $path) { if (is_file($path)) { unlink($path); } }
             error_log('Request submission failed: ' . $exception->getMessage());
-            $errors[] = 'Your request could not be saved. Please try again.';
+            $errors[] = $exception instanceof DomainException ? $exception->getMessage() : 'Your request could not be saved. Please try again.';
         }
     }
 }

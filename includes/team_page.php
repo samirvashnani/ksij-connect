@@ -108,7 +108,7 @@ try {
         $tasks = teamAssignedTasks((int) $staff['id'], $taskStatus, $getPage('tasks_page'), $searches['tasks_search']);
     }
     if ($requestedPanel === '' || $requestedPanel === 'open-help') {
-        $open = teamOpenTasks($category, $getPage('open_page'), $searches['open_search']);
+        $open = teamOpenTasks((int) $staff['id'], $category, $getPage('open_page'), $searches['open_search']);
         if ($cc) { $volunteers = teamAreaVolunteers($staff); }
     }
     if ($guarantor && ($requestedPanel === '' || $requestedPanel === 'guarantor-reviews')) {
@@ -138,6 +138,7 @@ foreach ($queueMetrics as [$panelId, $label, $icon, $list]): ?><a class="operati
 <p class="team-feedback" role="status" aria-live="polite" data-team-feedback></p>
 <?php if ($success): ?><p class="success" role="status"><?= escapeHtml($success) ?></p><?php endif; ?>
 <?php showError($error); showError($loadError); ?>
+<?php if (!$cc && trim((string) $staff['area']) === ''): ?><p class="error" role="status">Your area is not recorded. Please ask the office to update it before accepting community help requests.</p><?php endif; ?>
 <?php if (!$loadError): ?>
 <?php if ($teamPage === 'tasks'): ?>
 <section class="team-section community-help-team" id="assigned-tasks" data-team-panel data-page="tasks_page"><div class="page-heading"><h2>My tasks</h2><span class="muted" data-team-count data-total="<?= (int) $tasks['total'] ?>"><?= (int) $tasks['total'] ?> tasks</span></div>
@@ -192,5 +193,5 @@ foreach ($queueMetrics as [$panelId, $label, $icon, $list]): ?><a class="operati
 <section class="staff-start"><h2>Community support</h2><p>Choose an open request to help with, or continue a task you have already accepted.</p><div class="form-actions"><a class="button-link" href="<?= escapeHtml(teamDashboardUrl([], 'open-help')) ?>"><?= uiIcon('hand-heart') ?>Find a request</a><a class="button-link button-secondary" href="<?= escapeHtml(teamDashboardUrl([], 'assigned-tasks')) ?>">My tasks</a></div></section>
 <?php endif; ?>
 </section>
-<script src="<?= escapeHtml(appUrl('assets/js/team.js?v=4')) ?>" defer></script>
+<script src="<?= escapeHtml(appUrl('assets/js/team.js?v=5')) ?>" defer></script>
 <?php pageFooter(); ?>

@@ -2,6 +2,8 @@
 require_once dirname(__DIR__) . '/includes/auth_member.php';
 require_once dirname(__DIR__) . '/includes/layout.php';
 $member = requireMember();
+require_once dirname(__DIR__) . '/includes/request_eligibility.php';
+requireRequestEligibility($member);
 $categories = ['elderly_help' => 'Elderly help', 'urgent_medical' => 'Urgent medical', 'other' => 'Other'];
 $category = '';
 $description = '';
@@ -22,16 +24,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $errors[] = 'Enter a description of up to 10,000 characters.';
     }
     if (!$errors) {
+        $pdo = getDb();
         try {
+            $pdo->beginTransaction();
+            lockRequestEligibleMember($pdo, (int) $member['id']);
             $statement = getDb()->prepare("INSERT INTO help_requests (member_id, category, description, status) VALUES (?, ?, ?, 'open')");
             $statement->execute([(int) $member['id'], $category, $description]);
             $helpRequestId = (int) getDb()->lastInsertId();
+            $pdo->commit();
             unset($_SESSION['help_submission_token']);
             $_SESSION['help_success'] = 'Help request #' . $helpRequestId . ' submitted successfully.';
             redirectTo('public/help_requests_list.php');
         } catch (Throwable $exception) {
+            if ($pdo->inTransaction()) { $pdo->rollBack(); }
             error_log('Help request submission failed: ' . $exception->getMessage());
-            $errors[] = 'Your help request could not be saved. Please try again.';
+            $errors[] = $exception instanceof DomainException ? $exception->getMessage() : 'Your help request could not be saved. Please try again.';
         }
     }
 }

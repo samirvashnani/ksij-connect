@@ -1,14 +1,12 @@
 <?php
 require_once __DIR__ . '/db.php';
-require_once __DIR__ . '/fund_documents.php';
 
 function memberDashboardData(int $memberId): array
 {
     $queries = [
         'requests' => ['SELECT id,type,amount_requested,guarantor1_status,guarantor2_status,office_status,created_at FROM requests WHERE member_id = ? ORDER BY created_at DESC,id DESC LIMIT 3', [$memberId]],
         'help' => ["SELECT h.id,h.category,h.description,h.created_at,m.area FROM help_requests h LEFT JOIN members m ON m.id = h.member_id WHERE h.status = 'open' ORDER BY h.created_at DESC,h.id DESC LIMIT 2", []],
-        // Public previews use the same medical-document eligibility as the fund board.
-        'funds' => ["SELECT id,title,amount_needed,amount_raised FROM funds WHERE status = 'active' AND " . medicalFundEligibilitySql() . ' ORDER BY created_at DESC,id DESC LIMIT 2', []],
+        'donations' => ['SELECT id,title,quote FROM donation_projects WHERE is_active=1 ORDER BY id DESC LIMIT 2', []],
     ];
     $data = ['errors' => []];
     foreach ($queries as $key => [$sql, $parameters]) {

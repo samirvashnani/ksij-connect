@@ -16,10 +16,16 @@ function getVolunteerContext(string $question, int $staffId, string $role): arra
     $statement = getDb()->prepare('SELECT id,category,status,created_at FROM help_requests WHERE assigned_volunteer_id = ? ORDER BY id DESC LIMIT 10');
     $statement->execute([$staffId]);
     $context[] = ['source' => 'Your latest assigned tasks (maximum 10)', 'records' => $statement->fetchAll()];
-    $context[] = ['source' => 'Community-wide open unassigned help total', 'record' => [
-        'open_count' => (int) getDb()->query("SELECT COUNT(*) FROM help_requests WHERE status = 'open' AND assigned_volunteer_id IS NULL")->fetchColumn(),
-    ]];
-    $context[] = ['source' => 'Latest community-wide open help (maximum 10)', 'records' => getDb()->query("SELECT id,category,status,created_at FROM help_requests WHERE status = 'open' AND assigned_volunteer_id IS NULL ORDER BY id DESC LIMIT 10")->fetchAll()];
+    $parameters = [];
+    $openWhere = "h.status = 'open' AND h.assigned_volunteer_id IS NULL" . teamHelpAreaCondition($staff, $parameters);
+    $openFrom = 'help_requests h LEFT JOIN members m ON m.id = h.member_id';
+    $scope = $staff['role'] === 'volunteer' ? 'Your area' : 'Community-wide';
+    $statement = getDb()->prepare('SELECT COUNT(*) FROM ' . $openFrom . ' WHERE ' . $openWhere);
+    $statement->execute($parameters);
+    $context[] = ['source' => $scope . ' open unassigned help total', 'record' => ['open_count' => (int) $statement->fetchColumn()]];
+    $statement = getDb()->prepare('SELECT h.id,h.category,h.status,h.created_at FROM ' . $openFrom . ' WHERE ' . $openWhere . ' ORDER BY h.id DESC LIMIT 10');
+    $statement->execute($parameters);
+    $context[] = ['source' => $scope . ' latest open help (maximum 10)', 'records' => $statement->fetchAll()];
     if (teamGuarantorEligible($staff)) {
         $statement = getDb()->prepare("SELECT COUNT(*) FROM requests WHERE office_status = 'pending' AND ((guarantor1_id = ? AND guarantor1_status = 'pending') OR (guarantor2_id = ? AND guarantor2_status = 'pending'))");
         $statement->execute([$staffId, $staffId]);

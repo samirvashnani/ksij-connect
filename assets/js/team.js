@@ -262,7 +262,8 @@
         const controller = new AbortController();
         const timeout = setTimeout(() => controller.abort(), 45000);
         try {
-            const response = await fetch(form.action, {
+            // A hidden input named action shadows the form.action property.
+            const response = await fetch(form.getAttribute('action') || window.location.href, {
                 method: 'POST', body, credentials: 'same-origin', signal: controller.signal,
                 headers: { 'X-Requested-With': 'XMLHttpRequest', Accept: 'application/json' }
             });

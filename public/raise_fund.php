@@ -4,6 +4,8 @@ require_once dirname(__DIR__) . '/includes/layout.php';
 require_once dirname(__DIR__) . '/includes/money.php';
 require_once dirname(__DIR__) . '/includes/fund_documents.php';
 $member = requireMember();
+require_once dirname(__DIR__) . '/includes/request_eligibility.php';
+requireRequestEligibility($member);
 require_once dirname(__DIR__) . '/includes/notifications.php';
 $values = ['title' => '', 'reason' => '', 'medical_details' => '', 'amount_needed' => '', 'due_date' => ''];
 $errors = [];
@@ -50,6 +52,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $storedPaths = [];
         try {
             $pdo->beginTransaction();
+            lockRequestEligibleMember($pdo, (int) $member['id']);
             $statement = $pdo->prepare("INSERT INTO funds (member_id, title, reason, purpose, medical_details, amount_needed, amount_raised, due_date, status) VALUES (?, ?, ?, 'medical', ?, ?, 0.00, ?, 'pending_approval')");
             $statement->execute([$member['id'], $values['title'], $values['reason'], $values['medical_details'], centsToDecimal($needed), $values['due_date'] !== '' ? $values['due_date'] : null]);
             $fundId = (int) $pdo->lastInsertId();
@@ -73,7 +76,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
             }
             error_log('Fund submission failed: ' . $exception->getMessage());
-            $errors[] = 'Your fund could not be saved. Please try again.';
+            $errors[] = $exception instanceof DomainException ? $exception->getMessage() : 'Your fund could not be saved. Please try again.';
         }
     }
 }

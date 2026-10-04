@@ -63,5 +63,5 @@ pageHeader('Community help', $member);
         <?php endif; ?>
     </div>
 </section>
-<script src="<?= escapeHtml(appUrl('assets/js/help_board.js?v=1')) ?>" defer></script>
+<script src="<?= escapeHtml(appUrl('assets/js/help_board.js?v=2')) ?>" defer></script>
 <?php pageFooter(); ?>

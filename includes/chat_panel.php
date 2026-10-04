@@ -19,7 +19,7 @@ function renderChatPanel(string $audience, ?array $identity = null, bool $autoOp
         ['Office contacts', 'How can I contact the Jamaat office?', 'contact'],
     ];
     if ($audience === 'member') {
-        $topics = [['My requests', 'What is the status of my requests?', 'clipboard-list'], ['Membership fees', 'What are my membership fees due?', 'users'], ['Medical funds', 'What medical funds are available?', 'heart-pulse']];
+        $topics = [['My requests', 'What is the status of my requests?', 'clipboard-list'], ['Membership fees', 'What are my membership fees due?', 'users']];
     } elseif (in_array($role, ['volunteer', 'cc_member'], true)) {
         $topics = [['My tasks', 'What are my assigned tasks?', 'clipboard-list'], ['Open help', 'What help requests are open and unassigned?', 'hand-heart']];
         if ($role === 'cc_member' || !empty($identity['is_guarantor_approved'])) {
@@ -27,7 +27,7 @@ function renderChatPanel(string $audience, ?array $identity = null, bool $autoOp
         }
         if ($role === 'cc_member') { $topics[] = ['Volunteer activity', 'Show volunteer activity in my area.', 'users']; }
     } elseif ($role === 'admin') {
-        $topics = [['Pending requests', 'How many office requests are pending?', 'clipboard-list'], ['Open help', 'How many help requests are open?', 'hand-heart'], ['Medical funds', 'How many medical funds await approval?', 'heart-pulse']];
+        $topics = [['Pending requests', 'How many office requests are pending?', 'clipboard-list'], ['Open help', 'How many help requests are open?', 'hand-heart'], ['Membership fees', 'How many members have fees due?', 'users']];
     }
     ?>
     <button type="button" class="chat-launcher" aria-label="Open KSIJ Assistant" title="Open KSIJ Assistant" aria-haspopup="dialog" aria-expanded="false" aria-controls="ksij-assistant" data-chat-launcher><?= uiIcon('message-circle') ?><span class="chat-unread" data-chat-unread hidden></span></button>

@@ -27,9 +27,11 @@ function verifiedStaffAnswer(string $question, array $context, string $language)
         $blocks[] = implode("\n", $lines);
     }
     if ($open) {
-        $lines = [$roman ? 'Community ke open help requests' : 'Community-wide open help requests'];
-        $lines[] = 'Total: ' . (int) ($sources['Community-wide open unassigned help total']['record']['open_count'] ?? 0);
-        $rows = $sources['Latest community-wide open help (maximum 10)']['records'] ?? [];
+        $local = $permissions['role'] === 'volunteer';
+        $scope = $local ? 'Your area' : 'Community-wide';
+        $lines = [$roman ? ($local ? 'Aapke area ke open help requests' : 'Community ke open help requests') : ($local ? 'Open help requests in your area' : 'Community-wide open help requests')];
+        $lines[] = 'Total: ' . (int) ($sources[$scope . ' open unassigned help total']['record']['open_count'] ?? 0);
+        $rows = $sources[$scope . ' latest open help (maximum 10)']['records'] ?? [];
         if ($rows) { $lines[] = 'Latest records (max 10):'; }
         foreach ($rows as $row) { $lines[] = '#' . (int) $row['id'] . ' - ' . str_replace('_', ' ', $row['category']) . ' - open'; }
         $blocks[] = implode("\n", $lines);

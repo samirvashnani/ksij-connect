@@ -17,15 +17,6 @@ function getAdminContext(string $question): array
         ];
     }
 
-    if (stripos($questionText, 'pending approval') !== false || stripos($questionText, 'funds') !== false || stripos($questionText, 'approved') !== false) {
-        $count = (int) $pdo->query("SELECT COUNT(*) FROM funds WHERE status = 'pending_approval'")->fetchColumn();
-        $snippets[] = [
-            'title' => 'Funds needing approval',
-            'value' => (string) $count,
-            'detail' => 'Open requests waiting for admin approval.',
-        ];
-    }
-
     if (stripos($questionText, 'unassigned help') !== false || stripos($questionText, 'help requests') !== false || stripos($questionText, 'help') !== false) {
         $count = (int) $pdo->query("SELECT COUNT(*) FROM help_requests WHERE status = 'open'")->fetchColumn();
         $snippets[] = [
@@ -48,7 +39,7 @@ function getAdminContext(string $question): array
         $snippets[] = [
             'title' => 'Quick admin overview',
             'value' => 'Available',
-            'detail' => 'Ask about fees, funds, requests, or help requests.',
+            'detail' => 'Ask about fees, formal requests, or help requests.',
         ];
     }
 

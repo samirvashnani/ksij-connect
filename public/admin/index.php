@@ -10,7 +10,6 @@ $metrics = [
     'members' => ['Members', 'users', 'public/admin/members.php', 'SELECT COUNT(*) FROM members'],
     'pending_fees' => ['Members with fees due', 'calendar-days', 'public/admin/members.php', 'SELECT COUNT(*) FROM members WHERE fees_due > 0'],
     'open_help' => ['Unassigned help', 'hand-heart', 'public/admin/help_requests_assign.php', "SELECT COUNT(*) FROM help_requests WHERE status = 'open'"],
-    'pending_funds' => ['Funds awaiting approval', 'heart-pulse', 'public/admin/funds_approval.php', "SELECT COUNT(*) FROM funds WHERE status = 'pending_approval'"],
     'pending_requests' => ['Ready for office review', 'clipboard-list', 'public/admin/requests_overview.php', "SELECT COUNT(*) FROM requests WHERE office_status = 'pending' AND guarantor1_status = 'approved' AND guarantor2_status = 'approved'"],
 ];
 $overview = [];
@@ -50,7 +49,7 @@ pageHeader('Office dashboard', $staff, true);
         <?php foreach ($readyRequests as $request): ?><a class="office-queue-row" href="<?= escapeHtml(appUrl('public/request_details.php?id=' . (int) $request['id'])) ?>"><span class="office-queue-icon"><?= uiIcon($request['type'] === 'medical_aid' ? 'heart-pulse' : ($request['type'] === 'scholarship' ? 'graduation-cap' : 'file-plus')) ?></span><span class="office-queue-person"><strong><?= escapeHtml($request['full_name']) ?></strong><span><?= escapeHtml($types[$request['type']] ?? 'Request') ?> / #<?= (int) $request['id'] ?></span><small><?= escapeHtml($request['membership_id']) ?> / <?= escapeHtml($request['created_at']) ?></small></span><span class="status-badge status-pending">Ready for review</span><?= uiIcon('chevron-right') ?></a><?php endforeach; ?>
     </section>
     <section class="office-management" aria-labelledby="office-management-heading"><div class="dashboard-section-heading"><h2 id="office-management-heading"><?= uiIcon('settings') ?>Management</h2></div>
-        <?php foreach ([['public/admin/help_requests_assign.php', 'Coordinate help', 'hand-heart'], ['public/admin/funds_approval.php', 'Review medical funds', 'heart-pulse'], ['public/admin/members.php', 'Member directory', 'users'], ['public/admin/staff_users.php', 'Team accounts', 'shield-check'], ['public/admin/events.php', 'Community events', 'calendar-days'], ['public/admin/news_updates.php', 'Announcements', 'newspaper']] as [$path, $label, $icon]): ?><a class="office-management-link" href="<?= escapeHtml(appUrl($path)) ?>"><?= uiIcon($icon) ?><span><?= escapeHtml($label) ?></span><?= uiIcon('arrow-up-right') ?></a><?php endforeach; ?>
+        <?php foreach ([['public/admin/help_requests_assign.php', 'Coordinate help', 'hand-heart'], ['public/admin/members.php', 'Member directory', 'users'], ['public/admin/staff_users.php', 'Team accounts', 'shield-check'], ['public/admin/events.php', 'Community events', 'calendar-days'], ['public/admin/news_updates.php', 'Announcements', 'newspaper']] as [$path, $label, $icon]): ?><a class="office-management-link" href="<?= escapeHtml(appUrl($path)) ?>"><?= uiIcon($icon) ?><span><?= escapeHtml($label) ?></span><?= uiIcon('arrow-up-right') ?></a><?php endforeach; ?>
     </section>
     </div>
 </section>

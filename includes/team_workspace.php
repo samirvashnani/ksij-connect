@@ -63,10 +63,20 @@ function teamAssignedTasks(int $staffId, string $status, int $page, string $sear
         'h.id,h.category,h.description,h.status,h.created_at,m.area', $where, $parameters, $page);
 }
 
-function teamOpenTasks(string $category, int $page, string $search = ''): array
+function teamHelpAreaCondition(array $staff, array &$parameters): string
+{
+    if ($staff['role'] !== 'volunteer') { return ''; }
+    $area = trim((string) ($staff['area'] ?? ''));
+    if ($area === '') { return ' AND 1 = 0'; }
+    $parameters[] = $area;
+    return ' AND LOWER(TRIM(m.area)) = LOWER(?)';
+}
+
+function teamOpenTasks(int $staffId, string $category, int $page, string $search = ''): array
 {
     $where = "h.status = 'open' AND h.assigned_volunteer_id IS NULL";
     $parameters = [];
+    $where .= teamHelpAreaCondition(currentTeamStaff($staffId), $parameters);
     if ($category !== '') { $where .= ' AND h.category = ?'; $parameters[] = $category; }
     $where .= teamSearchCondition($search, ['CAST(h.id AS CHAR)', 'h.description', 'm.area'], $parameters);
     return teamListPage('help_requests h LEFT JOIN members m ON m.id = h.member_id',
@@ -177,12 +187,21 @@ function teamClaimHelp(int $staffId, int $requestId): void
     $pdo = getDb();
     $pdo->beginTransaction();
     try {
-        currentTeamStaff($staffId, true);
+        $staff = currentTeamStaff($staffId, true);
         $statement = $pdo->prepare('SELECT id,member_id,status,assigned_volunteer_id FROM help_requests WHERE id = ? FOR UPDATE');
         $statement->execute([$requestId]);
         $request = $statement->fetch();
         if (!$request || $request['status'] !== 'open' || $request['assigned_volunteer_id'] !== null) {
             throw new DomainException('Someone has already taken this request, or it is no longer open. Refresh the list.');
+        }
+        if ($staff['role'] === 'volunteer') {
+            $parameters = [(int) $request['member_id']];
+            $areaCondition = teamHelpAreaCondition($staff, $parameters);
+            $statement = $pdo->prepare('SELECT m.id FROM members m WHERE m.id = ?' . $areaCondition . ' FOR UPDATE');
+            $statement->execute($parameters);
+            if (!$statement->fetch()) {
+                throw new DomainException('You can only accept requests from your own area. Ask the office to check your recorded area if needed.');
+            }
         }
         $statement = $pdo->prepare("UPDATE help_requests SET assigned_volunteer_id = ?, assigned_by_staff_id = NULL, status = 'assigned' WHERE id = ? AND status = 'open' AND assigned_volunteer_id IS NULL");
         $statement->execute([$staffId, $requestId]);

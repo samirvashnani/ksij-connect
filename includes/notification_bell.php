@@ -3,7 +3,7 @@ require_once __DIR__ . '/notifications.php';
 
 function notificationReturnPages(): array
 {
-    return ['public/member_chat.php', 'public/member_request.php', 'public/my_requests.php', 'public/membership_payment.php', 'public/help_requests_list.php', 'public/funds_board.php', 'public/fund_documents.php', 'public/staff_dashboard.php', 'public/staff_help.php', 'public/staff_tasks.php', 'public/staff_reviews.php', 'public/staff_activity.php', 'public/admin/index.php'];
+    return ['public/member_chat.php', 'public/member_request.php', 'public/my_requests.php', 'public/membership_payment.php', 'public/donations.php', 'public/donation_history.php', 'public/admin/donation_projects.php', 'public/admin/donation_ledger.php', 'public/help_requests_list.php', 'public/funds_board.php', 'public/fund_documents.php', 'public/staff_dashboard.php', 'public/staff_help.php', 'public/staff_tasks.php', 'public/staff_reviews.php', 'public/staff_activity.php', 'public/admin/index.php'];
 }
 
 function renderNotificationBell(string $recipientType, int $recipientId, string $defaultPage): void
