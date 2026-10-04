@@ -38,10 +38,10 @@ try {
 }
 $types = ['scholarship' => 'Education / scholarship', 'medical_aid' => 'Medical aid', 'loan' => 'Loan'];
 $amount = $request['amount_requested'] !== null ? moneyToCents((string) $request['amount_requested'], true) : null;
-$back = $recipientType === 'member' ? 'public/my_requests.php' : ($identity['role'] === 'admin' ? 'public/admin/requests_overview.php' : 'public/staff_dashboard.php#guarantor-reviews');
+$back = $recipientType === 'member' ? 'public/my_requests.php' : ($identity['role'] === 'admin' ? 'public/admin/requests_overview.php' : 'public/staff_reviews.php');
 pageHeader('Request #' . $requestId, $identity, $recipientType === 'staff');
 ?>
-<section class="workspace">
+<section class="workspace service-workspace request-detail-workspace">
     <div class="page-heading"><div><p class="eyebrow">PRIVATE REQUEST</p><h1><?= escapeHtml($types[$request['type']] ?? 'Request') ?> #<?= $requestId ?></h1></div><a href="<?= escapeHtml(appUrl($back)) ?>">Back to requests</a></div>
     <dl class="details"><div><dt>Member</dt><dd><?= escapeHtml($request['member_name']) ?></dd></div><div><dt>Membership ID</dt><dd><?= escapeHtml($request['membership_id']) ?></dd></div><div><dt>Amount requested</dt><dd><?= $amount !== null ? escapeHtml(formatMoney($amount)) : 'Not available' ?></dd></div><div><dt>Submitted</dt><dd><?= escapeHtml($request['created_at']) ?></dd></div></dl>
     <h2>Request summary</h2><p class="request-description"><?= escapeHtml($request['description']) ?></p>
@@ -53,9 +53,9 @@ pageHeader('Request #' . $requestId, $identity, $recipientType === 'staff');
     <h2>Review status</h2><dl class="request-statuses"><?php foreach ([1 => 'Guarantor 1', 2 => 'Guarantor 2', 'office' => 'Office'] as $slot => $label): $status = $request[$slot === 'office' ? 'office_status' : 'guarantor' . $slot . '_status']; ?><div><dt><?= $label ?></dt><dd><?= escapeHtml(ucfirst((string) $status)) ?></dd><?php if ($slot !== 'office' && !empty($request['guarantor' . $slot . '_notes'])): ?><p class="guarantor-notes"><?= escapeHtml($request['guarantor' . $slot . '_notes']) ?></p><?php endif; ?></div><?php endforeach; ?></dl>
     <h2>Documents</h2><?php showError($documentError); ?>
     <?php $labels = ['exam_result' => 'Last examination result'] + medicalDocumentCategories(); foreach ($documents as $document): ?>
-    <article class="request-row"><h3><?= escapeHtml($labels[$document['document_type']] ?? 'Supporting document') ?></h3><a class="document-link" href="<?= escapeHtml(appUrl('public/request_document.php?id=' . $requestId . '&document_id=' . (int) $document['id'])) ?>"><?= uiIcon('download') ?><?= escapeHtml($document['original_name']) ?></a><p class="muted"><?= number_format((int) $document['file_size'] / 1024, 1) ?> KB</p></article>
+    <article class="request-row"><h3><?= escapeHtml($labels[$document['document_type']] ?? 'Supporting document') ?></h3><p><?= escapeHtml($document['original_name']) ?></p><div class="document-actions"><a class="button-link button-secondary" target="_blank" rel="noopener" href="<?= escapeHtml(appUrl('public/request_document.php?id=' . $requestId . '&document_id=' . (int) $document['id'] . '&view=1')) ?>"><?= uiIcon('arrow-up-right') ?>View supporting document</a><a class="document-link" href="<?= escapeHtml(appUrl('public/request_document.php?id=' . $requestId . '&document_id=' . (int) $document['id'])) ?>"><?= uiIcon('download') ?>Download</a><span class="muted"><?= number_format((int) $document['file_size'] / 1024, 1) ?> KB</span></div></article>
     <?php endforeach; ?>
-    <?php $legacy = !empty($request['document_path']) && !in_array($request['document_path'], array_column($documents, 'stored_path'), true); if ($legacy): ?><a class="document-link" href="<?= escapeHtml(appUrl('public/request_document.php?id=' . $requestId)) ?>"><?= uiIcon('download') ?>Supporting document</a><?php endif; ?>
+    <?php $legacy = !empty($request['document_path']) && !in_array($request['document_path'], array_column($documents, 'stored_path'), true); if ($legacy): ?><div class="document-actions"><a class="button-link button-secondary" target="_blank" rel="noopener" href="<?= escapeHtml(appUrl('public/request_document.php?id=' . $requestId . '&view=1')) ?>"><?= uiIcon('arrow-up-right') ?>View supporting document</a><a class="document-link" href="<?= escapeHtml(appUrl('public/request_document.php?id=' . $requestId)) ?>"><?= uiIcon('download') ?>Download supporting document</a></div><?php endif; ?>
     <?php if (!$documents && !$legacy && !$documentError): ?><p class="muted">No documents on record.</p><?php endif; ?>
 </section>
 <?php pageFooter(); ?>

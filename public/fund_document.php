@@ -37,7 +37,8 @@ if ($document['mime_type'] !== $mime || !is_file($path) || !is_readable($path)) 
     exit('Document not found.');
 }
 header('Content-Type: ' . $mime);
-header('Content-Disposition: attachment; filename="medical-document-' . $documentId . '.' . $extension . '"');
+$disposition = ($_GET['view'] ?? '') === '1' ? 'inline' : 'attachment';
+header('Content-Disposition: ' . $disposition . '; filename="medical-document-' . $documentId . '.' . $extension . '"');
 header('Content-Length: ' . filesize($path));
 header('Cache-Control: private, no-store');
 header('X-Content-Type-Options: nosniff');

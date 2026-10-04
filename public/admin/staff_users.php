@@ -110,14 +110,15 @@ renderAdminMessages($success, $error);
         <h2>Staff roster</h2>
         <div class="table-wrap">
             <table class="data-table">
-                <thead><tr><th>Name</th><th>Role</th><th>Area</th><th>Guarantor</th><th>Action</th></tr></thead>
+                <thead><tr><th>Name</th><th>Role</th><th>Area</th><th>Account</th><th>Guarantor</th><th>Action</th></tr></thead>
                 <tbody>
                     <?php foreach ($rows as $row): ?>
                         <tr>
                             <td><?= escapeHtml($row['full_name']) ?></td>
-                            <td><?= escapeHtml($row['role']) ?></td>
+                            <td><?= escapeHtml(['volunteer' => 'Volunteer', 'cc_member' => 'CC member', 'admin' => 'Office admin'][$row['role']] ?? $row['role']) ?></td>
                             <td><?= escapeHtml($row['area'] ?: '—') ?></td>
-                            <td><?= !empty($row['is_guarantor_approved']) ? 'Yes' : 'No' ?></td>
+                            <td><span class="status-badge status-<?= !empty($row['is_active']) ? 'active' : 'rejected' ?>"><?= !empty($row['is_active']) ? 'Active' : 'Inactive' ?></span></td>
+                            <td><?= !empty($row['is_active']) && ($row['role'] === 'cc_member' || ($row['role'] === 'volunteer' && !empty($row['is_guarantor_approved']))) ? 'Eligible' : 'Not eligible' ?></td>
                             <td class="row-actions">
                                 <a href="<?= escapeHtml(appUrl('public/admin/staff_users.php?edit=' . (int) $row['id'])) ?>">Edit</a>
                                 <form method="post" onsubmit="return confirm('Delete this staff record?');">

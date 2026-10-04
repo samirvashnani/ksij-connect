@@ -172,6 +172,31 @@ function teamDecideGuarantor(int $staffId, int $requestId, string $decision, str
     }
 }
 
+function teamClaimHelp(int $staffId, int $requestId): void
+{
+    $pdo = getDb();
+    $pdo->beginTransaction();
+    try {
+        currentTeamStaff($staffId, true);
+        $statement = $pdo->prepare('SELECT id,member_id,status,assigned_volunteer_id FROM help_requests WHERE id = ? FOR UPDATE');
+        $statement->execute([$requestId]);
+        $request = $statement->fetch();
+        if (!$request || $request['status'] !== 'open' || $request['assigned_volunteer_id'] !== null) {
+            throw new DomainException('Someone has already taken this request, or it is no longer open. Refresh the list.');
+        }
+        $statement = $pdo->prepare("UPDATE help_requests SET assigned_volunteer_id = ?, assigned_by_staff_id = NULL, status = 'assigned' WHERE id = ? AND status = 'open' AND assigned_volunteer_id IS NULL");
+        $statement->execute([$staffId, $requestId]);
+        if ($statement->rowCount() !== 1) { throw new DomainException('This request changed. Refresh the list.'); }
+        if ($request['member_id']) {
+            createNotification('member', (int) $request['member_id'], 'Help request accepted', 'A team member has offered to help with request #' . $requestId . '.');
+        }
+        $pdo->commit();
+    } catch (Throwable $exception) {
+        if ($pdo->inTransaction()) { $pdo->rollBack(); }
+        throw $exception;
+    }
+}
+
 function teamAssignHelp(int $staffId, int $requestId, int $volunteerId): void
 {
     $pdo = getDb();

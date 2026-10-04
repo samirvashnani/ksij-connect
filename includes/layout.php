@@ -17,9 +17,9 @@ function workspaceNavigation(bool $staff, string $role, bool $guarantor = false)
         ];
     }
     if ($role !== 'admin') {
-        $groups = ['Team workspace' => [['public/staff_dashboard.php', 'My workspace', 'layout-dashboard'], ['public/staff_dashboard.php#assigned-tasks', 'Assigned tasks', 'clipboard-list'], ['public/staff_dashboard.php#open-help', 'Open community help', 'hand-heart']]];
-        if ($guarantor) { $groups['Reviews'] = [['public/staff_dashboard.php#guarantor-reviews', 'Guarantor reviews', 'shield-check']]; }
-        if ($role === 'cc_member') { $groups['Coordination'] = [['public/staff_dashboard.php#volunteer-activity', 'Volunteer activity', 'users']]; }
+        $groups = ['Team workspace' => [['public/staff_dashboard.php', 'Dashboard', 'layout-dashboard'], ['public/staff_help.php', 'Community help', 'hand-heart'], ['public/staff_tasks.php', 'My tasks', 'clipboard-list']]];
+        if ($guarantor) { $groups['Reviews'] = [['public/staff_reviews.php', 'Guarantor reviews', 'shield-check']]; }
+        if ($role === 'cc_member') { $groups['Coordination'] = [['public/staff_activity.php', 'Volunteer activity', 'users']]; }
         $groups['Helpdesk'] = [['public/staff_dashboard.php#chat-heading', 'Jamaat helpdesk', 'message-circle']];
         return $groups;
     }
@@ -41,8 +41,8 @@ function pageHeader(string $title, ?array $identity = null, bool $staff = false)
     ?><!doctype html>
     <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
     <title><?= escapeHtml($title) ?> | KSIJ Connect</title>
-    <link rel="stylesheet" href="<?= escapeHtml(appUrl('assets/css/style.css?v=10')) ?>">
-    <script src="<?= escapeHtml(appUrl('assets/js/ui.js?v=2')) ?>" defer></script></head>
+    <link rel="stylesheet" href="<?= escapeHtml(appUrl('assets/css/style.css?v=13')) ?>">
+    <script src="<?= escapeHtml(appUrl('assets/js/ui.js?v=3')) ?>" defer></script></head>
     <body class="<?= $identity ? 'has-sidebar' : ($authPage ? 'auth-shell' : 'public-shell') ?>"><a class="skip-link" href="#main-content">Skip to content</a>
     <header class="site-header"><div class="header-start">
     <?php if ($identity): ?><button type="button" class="icon-button navigation-toggle" aria-label="Open navigation" title="Open navigation" aria-expanded="false" aria-controls="app-sidebar" data-nav-toggle><?= uiIcon('menu') ?></button><?php endif; ?>

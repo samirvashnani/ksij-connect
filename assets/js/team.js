@@ -3,7 +3,7 @@
     const workspace = document.querySelector('[data-team-workspace]');
     if (!workspace) return;
     const navigation = workspace.querySelector('.team-nav');
-    const tabs = [...navigation.querySelectorAll('a')];
+    const tabs = navigation ? [...navigation.querySelectorAll('a')] : [];
     const panels = [...workspace.querySelectorAll('[data-team-panel]')];
     const feedback = workspace.querySelector('[data-team-feedback]');
     const requests = new Map();
@@ -11,7 +11,20 @@
     const timers = new Map();
     const mutations = new Set();
     const drafts = new Map();
+    const disabledButtons = new WeakMap();
     const stateUrl = new URL(location.href);
+    // Keep existing bookmarked queue links working after splitting the workspace.
+    if (!workspace.dataset.defaultPanel) {
+        const legacyPages = { 'assigned-tasks': 'staff_tasks.php', 'open-help': 'staff_help.php',
+            'guarantor-reviews': 'staff_reviews.php', 'volunteer-activity': 'staff_activity.php' };
+        const destination = legacyPages[location.hash.slice(1)];
+        if (destination) {
+            const url = new URL(destination, location.href);
+            url.search = location.search;
+            location.replace(url);
+            return;
+        }
+    }
 
     function cancelRequest(panel) {
         const controller = requests.get(panel);
@@ -73,7 +86,10 @@
         const timeout = setTimeout(() => controller.abort(), 30000);
         const results = panel.querySelector('[data-team-results]');
         results.setAttribute('aria-busy', 'true');
-        results.querySelectorAll('button').forEach(button => { button.disabled = true; });
+        results.querySelectorAll('button').forEach(button => {
+            if (!disabledButtons.has(button)) disabledButtons.set(button, button.disabled);
+            button.disabled = true;
+        });
         if (!panel.hidden) announce('Updating results...');
         try {
             // Reuse server-rendered rows; only the requested queue is replaced.
@@ -120,7 +136,12 @@
             if (requests.get(panel) === controller) {
                 requests.delete(panel);
                 results.removeAttribute('aria-busy');
-                results.querySelectorAll('button').forEach(button => { button.disabled = false; });
+                results.querySelectorAll('button').forEach(button => {
+                    if (disabledButtons.has(button)) {
+                        button.disabled = disabledButtons.get(button);
+                        disabledButtons.delete(button);
+                    }
+                });
             }
         }
     }
@@ -129,7 +150,10 @@
         const wantsChat = id === 'chat-heading' || id === 'team-helpdesk';
         const selected = panels.find(panel => panel.id === id)
             || panels.find(panel => panel.id === workspace.dataset.defaultPanel) || panels[0];
-        if (!selected) return;
+        if (!selected) {
+            if (wantsChat && reload) document.dispatchEvent(new CustomEvent('ksij:chat-open'));
+            return;
+        }
         panels.forEach(panel => { panel.hidden = panel !== selected; });
         tabs.forEach(tab => {
             const active = tab.hash === `#${selected.id}`;
@@ -144,7 +168,7 @@
         if (reload) refresh(selected);
     }
 
-    navigation.setAttribute('role', 'tablist');
+    if (navigation) navigation.setAttribute('role', 'tablist');
     tabs.forEach((tab, index) => {
         const panel = panels.find(item => `#${item.id}` === tab.hash);
         if (!panel) return;

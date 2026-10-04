@@ -124,17 +124,20 @@ if ($fund && empty($_SESSION['donation_tokens'][$fundId])) {
 $canDonate = $fund && $balance !== null && $needed !== null && $raised !== null && $balance > 0 && $remaining > 0;
 pageHeader('Donate', $member);
 ?>
-<section class="workspace">
+<section class="workspace service-workspace donation-workspace">
     <div class="page-heading"><div><p class="eyebrow">MEDICAL SUPPORT</p><h1>Donate</h1></div><a href="<?= escapeHtml(appUrl('public/funds_board.php')) ?>">Medical funds</a></div>
     <?php foreach ($errors as $error): showError($error); endforeach; ?>
     <?php if ($fund): ?>
+    <div class="donation-layout">
     <div class="donation-details"><h2><?= escapeHtml($fund['title']) ?></h2><p class="request-description"><?= escapeHtml($fund['reason'] ?? '') ?></p><dl class="details"><div><dt>Your wallet balance</dt><dd><?= $balance !== null ? escapeHtml(formatMoney($balance)) : 'Unavailable' ?></dd></div><div><dt>Remaining target</dt><dd><?= $needed !== null && $raised !== null ? escapeHtml(formatMoney($remaining)) : 'Unavailable' ?></dd></div></dl></div>
+    <div class="donation-checkout"><h2>Your contribution</h2>
     <?php if ($balance === 0): ?><p class="notice">Your wallet has no available balance. Please contact the office to add funds.</p><?php elseif ($needed !== null && $raised !== null && $remaining === 0): ?><p class="notice">This fund is already fully funded.</p><?php endif; ?>
     <form class="request-form" method="post">
         <?php csrfField(); ?><input type="hidden" name="fund_id" value="<?= (int) $fundId ?>"><input type="hidden" name="submission_token" value="<?= escapeHtml($_SESSION['donation_tokens'][$fundId]) ?>">
         <label for="amount">Donation amount (INR)</label><input id="amount" name="amount" type="number" inputmode="decimal" min="0.01" step="0.01" max="<?= $canDonate ? centsToDecimal(min($balance, $remaining)) : '0' ?>" value="<?= escapeHtml($amount) ?>" required<?= !$canDonate ? ' disabled' : '' ?>>
         <div class="form-actions"><button type="submit"<?= !$canDonate ? ' disabled' : '' ?>>Confirm donation</button><a href="<?= escapeHtml(appUrl('public/funds_board.php')) ?>">Cancel</a></div>
     </form>
+    </div></div>
     <?php endif; ?>
 </section>
 <?php pageFooter(); ?>

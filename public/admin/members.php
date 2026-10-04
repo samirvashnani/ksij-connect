@@ -108,14 +108,15 @@ renderAdminMessages($success, $error);
         <h2>Member list</h2>
         <div class="table-wrap">
             <table class="data-table">
-                <thead><tr><th>ID</th><th>Name</th><th>Area</th><th>Wallet</th><th>Action</th></tr></thead>
+                <thead><tr><th>ID</th><th>Name</th><th>Area</th><th>Membership</th><th>Fees due</th><th>Action</th></tr></thead>
                 <tbody>
                     <?php foreach ($rows as $row): ?>
                         <tr>
                             <td><?= escapeHtml($row['membership_id']) ?></td>
                             <td><?= escapeHtml($row['full_name']) ?></td>
                             <td><?= escapeHtml($row['area'] ?: '—') ?></td>
-                            <td><?= escapeHtml(formatMoney($row['wallet_balance'])) ?></td>
+                            <td><span class="status-badge status-<?= $row['membership_status'] === 'active' ? 'approved' : ($row['membership_status'] === 'expired' ? 'rejected' : 'pending') ?>"><?= escapeHtml(ucfirst($row['membership_status'])) ?></span></td>
+                            <td><?= escapeHtml(formatMoney($row['fees_due'])) ?></td>
                             <td class="row-actions">
                                 <a href="<?= escapeHtml(appUrl('public/admin/members.php?edit=' . (int) $row['id'])) ?>">Edit</a>
                                 <form method="post" onsubmit="return confirm('Delete this member?');">

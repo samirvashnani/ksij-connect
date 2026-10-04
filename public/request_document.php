@@ -55,7 +55,8 @@ if (!is_file($path) || !is_readable($path)) {
 }
 $extension = pathinfo($path, PATHINFO_EXTENSION);
 header('Content-Type: ' . ['pdf' => 'application/pdf', 'jpg' => 'image/jpeg', 'png' => 'image/png'][$extension]);
-header('Content-Disposition: attachment; filename="request-' . $requestId . ($documentId ? '-document-' . $documentId : '') . '.' . $extension . '"');
+$disposition = ($_GET['view'] ?? '') === '1' ? 'inline' : 'attachment';
+header('Content-Disposition: ' . $disposition . '; filename="request-' . $requestId . ($documentId ? '-document-' . $documentId : '') . '.' . $extension . '"');
 header('Content-Length: ' . filesize($path));
 header('Cache-Control: private, no-store');
 header('X-Content-Type-Options: nosniff');

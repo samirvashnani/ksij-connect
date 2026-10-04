@@ -60,11 +60,11 @@ renderAdminMessages($success, $error);
                     <?php $canOfficeDecision = $row['guarantor1_status'] === 'approved' && $row['guarantor2_status'] === 'approved'; ?>
                     <tr>
                         <td><?= escapeHtml($row['member_name']) ?> (<?= escapeHtml($row['membership_id']) ?>)</td>
-                        <td><?= escapeHtml(str_replace('_', ' ', $row['type'])) ?><br><a href="<?= escapeHtml(appUrl('public/request_details.php?id=' . (int) $row['id'])) ?>">Details and documents</a></td>
+                        <td><?= escapeHtml(str_replace('_', ' ', $row['type'])) ?><br><a href="<?= escapeHtml(appUrl('public/request_details.php?id=' . (int) $row['id'])) ?>">Details and documents</a><?php if ($row['document_path']): ?><div class="document-actions"><a class="button-link button-secondary small-button" target="_blank" rel="noopener" href="<?= escapeHtml(appUrl('public/request_document.php?id=' . (int) $row['id'] . '&view=1')) ?>"><?= uiIcon('arrow-up-right') ?>View supporting document</a><a class="document-link" href="<?= escapeHtml(appUrl('public/request_document.php?id=' . (int) $row['id'])) ?>"><?= uiIcon('download') ?>Download</a></div><?php endif; ?></td>
                         <td><?= escapeHtml(formatMoney($row['amount_requested'])) ?></td>
                         <td><?= escapeHtml($row['guarantor1_name'] ?: '—') ?><br><small><?= escapeHtml($row['guarantor1_status'] ?: 'pending') ?></small></td>
                         <td><?= escapeHtml($row['guarantor2_name'] ?: '—') ?><br><small><?= escapeHtml($row['guarantor2_status'] ?: 'pending') ?></small></td>
-                        <td><?= escapeHtml($row['office_status']) ?></td>
+                        <td><span class="status-badge status-<?= escapeHtml($row['office_status']) ?>"><?= escapeHtml(ucfirst($row['office_status'])) ?></span></td>
                         <td>
                             <?php if ($canOfficeDecision): ?>
                                 <form method="post" class="inline-form">

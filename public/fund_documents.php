@@ -66,7 +66,7 @@ unset($_SESSION['fund_success']);
 $statusLabels = ['pending_approval' => 'Awaiting office approval', 'active' => 'Active', 'completed' => 'Completed'];
 pageHeader($fundId || $isStaff ? 'Fund documents' : 'My funds', $identity, $isStaff);
 ?>
-<section class="workspace">
+<section class="workspace service-workspace fund-records-workspace">
     <div class="page-heading"><div><p class="eyebrow">PRIVATE FUND RECORDS</p><h1><?= $fundId || $isStaff ? 'Fund documents' : 'My funds' ?></h1></div><a href="<?= escapeHtml(appUrl($isStaff ? 'public/admin/index.php' : 'public/funds_board.php')) ?>"><?= $isStaff ? 'Admin workspace' : 'Medical funds' ?></a></div>
     <?php if ($success): ?><p class="success" role="status"><?= escapeHtml($success) ?></p><?php endif; ?>
     <?php showError($error); ?>
@@ -78,7 +78,7 @@ pageHeader($fundId || $isStaff ? 'Fund documents' : 'My funds', $identity, $isSt
         <?php foreach (medicalDocumentCategories() as $type => $label): $group = array_filter($documents, static fn($document) => $document['document_type'] === $type); ?>
         <section class="document-group"><h2><?= escapeHtml($label) ?></h2>
             <?php if (!$group): ?><p class="muted"><?= $type === 'other' ? 'No additional documents.' : 'Required documents are missing.' ?></p><?php endif; ?>
-            <?php foreach ($group as $document): ?><div class="document-row"><a class="document-link" href="<?= escapeHtml(appUrl('public/fund_document.php?id=' . (int) $document['id'])) ?>"><img src="<?= escapeHtml(appUrl('assets/icons/download.svg')) ?>" width="18" height="18" alt=""><span class="document-name"><?= escapeHtml($document['original_name']) ?></span></a><span class="muted"><?= escapeHtml(number_format((int) $document['file_size'] / 1024, 0)) ?> KB</span></div><?php endforeach; ?>
+            <?php foreach ($group as $document): ?><div class="document-row"><div><p class="document-name"><?= escapeHtml($document['original_name']) ?></p><div class="document-actions"><a class="button-link button-secondary" target="_blank" rel="noopener" href="<?= escapeHtml(appUrl('public/fund_document.php?id=' . (int) $document['id'] . '&view=1')) ?>"><?= uiIcon('arrow-up-right') ?>View supporting document</a><a class="document-link" href="<?= escapeHtml(appUrl('public/fund_document.php?id=' . (int) $document['id'])) ?>"><?= uiIcon('download') ?>Download</a><span class="muted"><?= escapeHtml(number_format((int) $document['file_size'] / 1024, 0)) ?> KB</span></div></div></div><?php endforeach; ?>
         </section>
         <?php endforeach; ?>
         <a href="<?= escapeHtml(appUrl('public/fund_documents.php')) ?>">All fund records</a>

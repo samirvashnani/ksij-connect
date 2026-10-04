@@ -32,14 +32,16 @@ function adminPageStart(string $title, array $staff): void
 {
     pageHeader($title, $staff, true);
     echo '<section class="workspace admin-workspace">';
-    echo '<div class="admin-header">';
-    echo '<div><p class="eyebrow">ADMIN</p><h1>' . escapeHtml($title) . '</h1></div>';
+    echo '<div class="admin-header operations-heading">';
+    echo '<div><p class="eyebrow">OFFICE MANAGEMENT</p><h1>' . escapeHtml($title) . '</h1></div>';
+    echo '<a class="document-link" href="' . escapeHtml(appUrl('public/admin/index.php')) . '">' . uiIcon('layout-dashboard') . 'Office dashboard</a>';
     echo '</div>';
 }
 
 function adminPageEnd(): void
 {
     echo '</section>';
+    echo '<script src="' . escapeHtml(appUrl('assets/js/admin_records.js?v=1')) . '" defer></script>';
     pageFooter();
 }
 

@@ -43,10 +43,11 @@ renderAdminMessages($success, $error);
                 <?php foreach ($rows as $row): ?>
                     <tr>
                         <td><?= escapeHtml($row['member_name']) ?> (<?= escapeHtml($row['membership_id']) ?>)</td>
-                        <td><?= escapeHtml($row['title']) ?><br><small><?= escapeHtml($row['reason']) ?></small></td>
+                        <td><?= escapeHtml($row['title']) ?><details class="admin-row-details"><summary>Request summary</summary><p><?= escapeHtml($row['reason']) ?></p></details></td>
                         <td><?= escapeHtml(formatMoney($row['amount_needed'])) ?></td>
                         <td><?= escapeHtml(formatMoney($row['amount_raised'])) ?></td>
                         <td>
+                            <a class="button-link button-secondary small-button" target="_blank" rel="noopener" href="<?= escapeHtml(appUrl('public/fund_documents.php?fund_id=' . (int) $row['id'])) ?>"><?= uiIcon('folder') ?>View supporting documents</a>
                             <form method="post" class="inline-form">
                                 <?php csrfField(); ?>
                                 <input type="hidden" name="action" value="approve">

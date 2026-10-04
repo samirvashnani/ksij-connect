@@ -40,7 +40,7 @@
     update(false);
 
     function highlightNavigation(panelId = '') {
-        const isTeamPage = Boolean(document.querySelector('[data-team-workspace]'));
+        const isTeamPage = Boolean(document.querySelector('[data-team-workspace]:not([data-single-page])'));
         const hash = panelId ? `#${panelId}` : location.hash
             || (isTeamPage ? `#${document.querySelector('[data-team-workspace]').dataset.defaultPanel}` : '');
         sidebar.querySelectorAll('.sidebar-link').forEach(link => {

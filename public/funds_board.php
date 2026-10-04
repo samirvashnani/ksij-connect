@@ -28,21 +28,22 @@ $success = $_SESSION['fund_success'] ?? '';
 unset($_SESSION['fund_success']);
 pageHeader('Medical funds', $member);
 ?>
-<section class="workspace">
+<section class="workspace service-workspace funds-workspace">
     <div class="page-heading"><div><p class="eyebrow">MEDICAL SUPPORT</p><h1>Medical funds</h1></div><a href="<?= escapeHtml(appUrl('public/fund_documents.php')) ?>">My funds</a></div>
     <?php if ($success): ?><p class="success" role="status"><?= escapeHtml($success) ?></p><?php endif; ?>
     <?php showError($error); ?>
-    <?php if (!$funds && !$error): ?><div class="empty-state"><h2>No active medical funds</h2></div><?php endif; ?>
+    <?php if (!$error): ?><div class="service-section-heading"><h2>Medical support</h2><span class="muted"><?= $total ?> active <?= $total === 1 ? 'fund' : 'funds' ?></span></div><?php endif; ?>
+    <?php if (!$funds && !$error): ?><div class="operations-empty"><?= uiIcon('heart-pulse') ?><h2>No active medical funds</h2></div><?php endif; ?>
     <div class="fund-grid">
     <?php foreach ($funds as $fund): $needed = moneyToCents((string) $fund['amount_needed']); $raised = moneyToCents((string) $fund['amount_raised'], true); ?>
-    <article class="fund-card"><h2><?= escapeHtml($fund['title']) ?></h2><p class="request-description"><?= escapeHtml($fund['reason'] ?? '') ?></p>
+    <article class="fund-card"><div class="fund-card-heading"><span class="service-symbol"><?= uiIcon('heart-pulse') ?></span><span class="muted">MEDICAL FUND #<?= (int) $fund['id'] ?></span></div><h2><?= escapeHtml($fund['title']) ?></h2><p class="request-description"><?= escapeHtml($fund['reason'] ?? '') ?></p>
         <?php if ($needed !== null && $raised !== null): $percentage = min(100, (int) floor($raised * 100 / $needed)); ?>
         <div class="fund-progress-label"><strong><?= escapeHtml(formatMoney($raised)) ?></strong><span class="muted"><?= $percentage ?>%</span></div>
         <progress value="<?= min($raised, $needed) ?>" max="<?= $needed ?>" aria-label="<?= escapeHtml($fund['title'] . ' progress') ?>"><?= $percentage ?>%</progress>
         <p class="muted">Target <?= escapeHtml(formatMoney($needed)) ?></p>
         <?php else: ?><p class="error">Fund amounts are unavailable.</p><?php endif; ?>
         <?php if ($fund['due_date']): ?><p class="muted">Due <?= escapeHtml($fund['due_date']) ?></p><?php endif; ?>
-        <div class="fund-card-action"><?php if ($needed !== null && $raised !== null && $raised < $needed): ?><a class="button-link" href="<?= escapeHtml(appUrl('public/donate.php?id=' . (int) $fund['id'])) ?>">Donate</a><?php elseif ($needed !== null && $raised !== null): ?><span class="status-badge status-approved">Fully funded</span><?php endif; ?></div>
+        <div class="fund-card-action"><?php if ($needed !== null && $raised !== null && $raised < $needed): ?><a class="button-link" href="<?= escapeHtml(appUrl('public/donate.php?id=' . (int) $fund['id'])) ?>"><?= uiIcon('hand-heart') ?>Contribute</a><span class="muted">Remaining <?= escapeHtml(formatMoney($needed - $raised)) ?></span><?php elseif ($needed !== null && $raised !== null): ?><span class="status-badge status-approved">Fully funded</span><?php endif; ?></div>
     </article>
     <?php endforeach; ?>
     </div>
