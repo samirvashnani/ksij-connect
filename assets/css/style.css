@@ -29,3 +29,76 @@ dt { font-size: 13px; color: #65726c; margin-bottom: 10px; }
 dd { margin: 0; overflow-wrap: anywhere; }
 .site-footer { border-top: 1px solid #d9dfdc; padding: 20px 5%; color: #65726c; font-size: 12px; }
 @media (max-width: 600px) { .site-header { align-items: flex-start; flex-direction: column; gap: 18px; padding: 20px; } nav { gap: 16px; } .auth { margin: 40px auto; } .details { grid-template-columns: 1fr; } h1 { font-size: 28px; } .account-name { overflow-wrap: anywhere; } }
+
+.member-nav { gap: 28px; padding: 0 5%; border-bottom: 1px solid #d9dfdc; background: #fff; }
+.global-message { width: min(1040px, calc(100% - 40px)); margin: 24px auto 0; }
+.overview-help { margin-top: 32px; border-top: 1px solid #d9dfdc; padding-top: 24px; }
+.list-filters { display: flex; align-items: flex-end; flex-wrap: wrap; gap: 16px; margin: 0 0 24px; }
+.list-filters > div { width: min(100%, 280px); }
+.list-filters select { margin: 0; }
+.list-filters > a { padding: 12px 0; }
+.help-area { color: #65726c; font-size: 13px; margin: 0; overflow-wrap: anywhere; }
+.status-open { background: #e4f0fa; color: #265b80; }
+.member-nav a { display: block; padding: 16px 0; text-decoration: none; border-bottom: 2px solid transparent; }
+.member-nav a[aria-current="page"] { border-color: #186c52; font-weight: 700; }
+.page-heading, .request-heading { display: flex; align-items: center; justify-content: space-between; gap: 20px; flex-wrap: wrap; }
+.page-heading { margin-bottom: 28px; }
+.page-heading h1 { margin-bottom: 0; }
+.button-link { display: inline-flex; align-items: center; justify-content: center; min-height: 46px; padding: 12px 20px; border-radius: 4px; background: #186c52; color: #fff; font-weight: 600; text-decoration: none; }
+.button-link:hover { background: #11513d; }
+.muted, .field-hint { color: #65726c; font-size: 13px; }
+.request-form { max-width: 740px; }
+.form-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; }
+select, textarea { width: 100%; min-width: 0; font: inherit; padding: 12px; border: 1px solid #b9c5bf; border-radius: 4px; background: #fff; margin-bottom: 22px; }
+select { min-height: 46px; }
+textarea { resize: vertical; line-height: 1.5; }
+select:focus-visible, textarea:focus-visible, summary:focus-visible { outline: 3px solid #ce9f36; outline-offset: 3px; }
+fieldset { border: 0; border-top: 1px solid #d9dfdc; margin: 6px 0 0; padding: 20px 0 0; min-width: 0; }
+legend { padding: 0 12px 0 0; font-size: 18px; font-weight: 600; }
+input[type="file"] { height: auto; min-height: 46px; margin-bottom: 8px; }
+.field-hint { margin: 0 0 24px; }
+.form-actions { display: flex; align-items: center; gap: 24px; flex-wrap: wrap; }
+button:disabled { background: #728078; cursor: not-allowed; }
+.success { padding: 14px; border-left: 3px solid #186c52; background: #eaf5ee; color: #11513d; }
+.empty-state { border-top: 1px solid #d9dfdc; padding: 32px 0; }
+h2 { font-size: 19px; line-height: 1.3; margin: 0 0 12px; overflow-wrap: anywhere; }
+.request-row { padding: 26px 0; border-top: 1px solid #d9dfdc; }
+.request-heading h2 { margin-bottom: 8px; }
+.request-amount { font-size: 18px; overflow-wrap: anywhere; }
+.request-description, .guarantor-notes { white-space: pre-wrap; overflow-wrap: anywhere; line-height: 1.6; }
+.request-description { margin: 20px 0; }
+.request-statuses { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; margin: 20px 0; }
+.request-statuses dd { display: flex; align-items: flex-start; flex-direction: column; gap: 10px; }
+.guarantor-name { overflow-wrap: anywhere; }
+.guarantor-notes { font-size: 13px; color: #65726c; }
+.status-badge { display: inline-block; padding: 5px 9px; font-size: 12px; font-weight: 600; border-radius: 4px; max-width: 100%; }
+.status-pending { background: #fff0c9; color: #6a510a; }
+.status-approved { background: #dff1e5; color: #185a38; }
+.status-rejected { background: #fbe3e5; color: #8b222a; }
+.document-link { display: inline-flex; align-items: center; gap: 8px; }
+.pagination { justify-content: flex-end; padding-top: 24px; border-top: 1px solid #d9dfdc; }
+.icon-link, .notification-bell summary { display: inline-flex; align-items: center; justify-content: center; width: 42px; height: 42px; border-radius: 4px; }
+.icon-link:hover, .notification-bell summary:hover { background: #edf3ef; }
+.notification-bell { position: relative; flex-shrink: 0; }
+.notification-bell summary { position: relative; cursor: pointer; list-style: none; }
+.notification-bell summary::-webkit-details-marker { display: none; }
+.notification-count { position: absolute; top: 0; right: -2px; min-width: 18px; height: 18px; padding: 2px 4px; border-radius: 9px; background: #bd3b43; color: #fff; font-size: 10px; font-weight: 700; text-align: center; }
+.notification-panel { position: absolute; top: 48px; right: 0; z-index: 10; width: min(360px, calc(100vw - 40px)); max-height: 420px; overflow-y: auto; border: 1px solid #d9dfdc; border-radius: 4px; background: #fff; box-shadow: 0 6px 20px #20262418; }
+.notification-panel h2 { display: flex; justify-content: space-between; margin: 0; padding: 18px; font-size: 16px; border-bottom: 1px solid #d9dfdc; }
+.notification-panel > p { padding: 16px 18px; margin: 0; }
+.notification-panel form { margin: 0; }
+.notification-item { display: flex; flex-direction: column; align-items: flex-start; gap: 8px; width: 100%; border-radius: 0; padding: 16px 18px; background: #fff; color: #202624; text-align: left; border-bottom: 1px solid #e4e9e6; }
+.notification-item:hover { background: #edf3ef; }
+.notification-item strong, .notification-item span { overflow-wrap: anywhere; max-width: 100%; line-height: 1.5; }
+.notification-item span { font-size: 13px; font-weight: 400; }
+.notification-item time { font-size: 11px; color: #65726c; font-weight: 400; }
+@media (max-width: 600px) {
+    .site-header > nav { width: 100%; gap: 12px; }
+    .account-name { flex: 1; min-width: 0; }
+    .member-nav { gap: 20px; padding: 0 20px; }
+    .form-grid, .request-statuses { grid-template-columns: 1fr; gap: 0; }
+    .request-statuses { gap: 20px; }
+    .workspace { margin: 32px auto; }
+    .request-heading { align-items: flex-start; }
+    .notification-panel { max-height: min(420px, 60vh); }
+}
