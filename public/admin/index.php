@@ -40,7 +40,7 @@ pageHeader('Office dashboard', $staff, true);
     <header class="operations-heading"><div><p class="eyebrow">OFFICE OPERATIONS</p><h1>Office dashboard</h1><p class="operations-person">Salaam, <?= escapeHtml($staff['full_name']) ?></p></div><button type="button" class="button-secondary" data-chat-open><?= uiIcon('message-circle') ?>KSIJ Assistant</button></header>
     <?php showError($metricError); ?>
     <div class="operations-metrics office-metrics">
-        <?php foreach ($metrics as $key => [$label, $icon, $path]): ?><a class="operations-metric metric-<?= $key ?>" href="<?= escapeHtml(appUrl($path)) ?>"><span class="metric-top"><?= uiIcon($icon) ?><?= uiIcon('arrow-up-right') ?></span><strong><?= $overview[$key] !== null ? (int) $overview[$key] : 'Unavailable' ?></strong><span><?= escapeHtml($label) ?></span></a><?php endforeach; ?>
+        <?php foreach ($metrics as $key => [$label, $icon, $path]): ?><a class="operations-metric metric-<?= $key ?>" href="<?= escapeHtml(appUrl($path)) ?>"><span class="metric-top"><?= uiIcon($icon) ?><?= uiIcon('arrow-up-right') ?></span><strong<?= $overview[$key] === null ? ' class="metric-unavailable"' : '' ?>><?= $overview[$key] !== null ? (int) $overview[$key] : 'Unavailable' ?></strong><span><?= escapeHtml($label) ?></span></a><?php endforeach; ?>
     </div>
     <div class="office-dashboard-columns">
     <section class="office-review-queue" aria-labelledby="office-review-heading">

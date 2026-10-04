@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/layout.php';
+require_once __DIR__ . '/community_help_view.php';
 
 function teamDashboardUrl(array $changes = [], string $anchor = ''): string
 {
@@ -43,18 +44,16 @@ function renderTeamSearch(string $name, string $value, string $label): void
 function renderTeamHelpRow(array $task, array $categories, bool $assigned, ?array $volunteers): void
 {
     ?>
-    <article class="request-row team-task-row<?= $task['category'] === 'urgent_medical' ? ' is-urgent' : '' ?>">
+    <article class="request-row team-task-row community-help-card<?= $task['category'] === 'urgent_medical' ? ' is-urgent' : '' ?>">
         <?php if ($assigned): ?><div class="team-task-strip"><?= uiIcon('clipboard-list') ?><?= $task['status'] === 'resolved' ? 'Resolved task' : 'Assigned to you' ?></div><?php endif; ?>
-        <div class="request-heading"><h3><?= escapeHtml($categories[$task['category']] ?? 'Other') ?> <span class="muted">#<?= (int) $task['id'] ?></span></h3><span class="status-badge status-<?= escapeHtml($task['status']) ?>"><?= escapeHtml(ucfirst($task['status'])) ?></span></div>
-        <p class="request-description"><?= escapeHtml($task['description']) ?></p>
-        <div class="team-meta"><span><?= escapeHtml(trim((string) $task['area']) ?: 'Community-wide') ?></span><time><?= escapeHtml($task['created_at']) ?></time></div>
+        <?php renderCommunityHelpContent($task); ?>
         <?php if ($assigned && $task['status'] === 'assigned'): ?>
         <form method="post" action="<?= escapeHtml(teamDashboardUrl([], 'assigned-tasks')) ?>" class="team-command"><?php csrfField(); ?><input type="hidden" name="action" value="resolve"><input type="hidden" name="request_id" value="<?= (int) $task['id'] ?>"><button type="submit"><?= uiIcon('shield-check') ?>Mark resolved</button></form>
         <?php elseif (!$assigned && $volunteers !== null): ?>
         <?php if ($volunteers): ?>
         <form method="post" action="<?= escapeHtml(teamDashboardUrl([], 'open-help')) ?>" class="team-assignment"><?php csrfField(); ?><input type="hidden" name="action" value="assign"><input type="hidden" name="request_id" value="<?= (int) $task['id'] ?>"><div><label for="volunteer-<?= (int) $task['id'] ?>">Volunteer</label><select id="volunteer-<?= (int) $task['id'] ?>" name="volunteer_id" required><option value="">Select volunteer</option><?php foreach ($volunteers as $volunteer): ?><option value="<?= (int) $volunteer['id'] ?>"><?= escapeHtml($volunteer['full_name']) ?></option><?php endforeach; ?></select></div><button type="submit">Assign</button></form>
         <?php else: ?><p class="muted">No active volunteers are available in your area.</p><?php endif; ?>
-        <?php endif; ?>
+        <?php else: ?><p class="community-help-closed"><?= uiIcon($task['status'] === 'resolved' ? 'shield-check' : 'users') ?><?= $task['status'] === 'resolved' ? 'Request resolved' : 'Awaiting coordinator assignment' ?></p><?php endif; ?>
     </article>
     <?php
 }

@@ -70,7 +70,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit;
     }
 }
-$categories = ['elderly_help' => 'Elderly help', 'urgent_medical' => 'Urgent medical', 'other' => 'Other'];
+$categories = communityHelpCategories();
 $taskStatus = is_string($_GET['task_status'] ?? null) ? $_GET['task_status'] : 'assigned';
 if (!in_array($taskStatus, ['', 'assigned', 'resolved'], true)) { $taskStatus = 'assigned'; }
 $category = is_string($_GET['category'] ?? null) && isset($categories[$_GET['category']]) ? $_GET['category'] : '';
@@ -130,14 +130,14 @@ foreach ($queueMetrics as [$panelId, $label, $icon, $list]): ?><a class="operati
 <?php if ($success): ?><p class="success" role="status"><?= escapeHtml($success) ?></p><?php endif; ?>
 <?php showError($error); showError($loadError); ?>
 <?php if (!$loadError): ?>
-<section class="team-section" id="assigned-tasks" data-team-panel data-page="tasks_page"><div class="page-heading"><h2>My tasks</h2><span class="muted" data-team-count data-total="<?= (int) $tasks['total'] ?>"><?= (int) $tasks['total'] ?> tasks</span></div>
+<section class="team-section community-help-team" id="assigned-tasks" data-team-panel data-page="tasks_page"><div class="page-heading"><h2>My tasks</h2><span class="muted" data-team-count data-total="<?= (int) $tasks['total'] ?>"><?= (int) $tasks['total'] ?> tasks</span></div>
 <form class="list-filters" data-team-filter method="get" action="<?= escapeHtml(appUrl('public/staff_dashboard.php')) ?>#assigned-tasks"><?php renderTeamFilterFields('task_status', 'tasks_page'); renderTeamSearch('tasks_search', $searches['tasks_search'], 'Search tasks'); ?><div><label for="task-status">Status</label><select id="task-status" name="task_status"><option value="assigned"<?= $taskStatus === 'assigned' ? ' selected' : '' ?>>Assigned</option><option value="resolved"<?= $taskStatus === 'resolved' ? ' selected' : '' ?>>Resolved</option><option value=""<?= $taskStatus === '' ? ' selected' : '' ?>>All</option></select></div><button type="submit">Apply</button></form>
 <div data-team-results>
 <?php if (!$tasks['rows']): ?><div class="operations-empty"><?= uiIcon('clipboard-list') ?><h3>No tasks in this view</h3></div><?php endif; ?>
 <?php foreach ($tasks['rows'] as $task) { renderTeamHelpRow($task, $categories, true, null); } ?>
 <?php renderTeamPagination($tasks, 'tasks_page', 'assigned-tasks'); ?></div></section>
 
-<section class="team-section" id="open-help" data-team-panel data-page="open_page"><div class="page-heading"><h2>Open community help</h2><span class="muted" data-team-count data-total="<?= (int) $open['total'] ?>"><?= (int) $open['total'] ?> open requests</span></div>
+<section class="team-section community-help-team" id="open-help" data-team-panel data-page="open_page"><div class="page-heading"><h2>Open community help</h2><span class="muted" data-team-count data-total="<?= (int) $open['total'] ?>"><?= (int) $open['total'] ?> open requests</span></div>
 <form class="list-filters" data-team-filter method="get" action="<?= escapeHtml(appUrl('public/staff_dashboard.php')) ?>#open-help"><?php renderTeamFilterFields('category', 'open_page'); renderTeamSearch('open_search', $searches['open_search'], 'Search help requests'); ?><div><label for="help-category">Category</label><select id="help-category" name="category"><option value="">All categories</option><?php foreach ($categories as $key => $label): ?><option value="<?= $key ?>"<?= $category === $key ? ' selected' : '' ?>><?= $label ?></option><?php endforeach; ?></select></div><button type="submit">Apply</button></form>
 <div data-team-results>
 <?php if (!$open['rows']): ?><div class="operations-empty"><?= uiIcon('hand-heart') ?><h3>No open help requests</h3></div><?php endif; ?>
