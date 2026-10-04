@@ -42,7 +42,7 @@ unset($_SESSION['help_success']);
 pageHeader('Help requests', $member);
 ?>
 <section class="workspace">
-    <div class="page-heading"><div><p class="eyebrow">COMMUNITY HELP</p><h1>Help requests</h1></div><a class="button-link" href="<?= escapeHtml(appUrl('public/help_request_new.php')) ?>">New help request</a></div>
+    <div class="page-heading"><div><p class="eyebrow">COMMUNITY HELP</p><h1>Help requests</h1></div></div>
     <?php if ($success): ?><p class="success" role="status"><?= escapeHtml($success) ?></p><?php endif; ?>
     <?php showError($error); ?>
     <form class="list-filters" method="get">

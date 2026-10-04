@@ -2,6 +2,8 @@
 require_once dirname(__DIR__) . '/includes/auth_member.php';
 require_once dirname(__DIR__) . '/includes/layout.php';
 $member = requireMember();
+require_once dirname(__DIR__) . '/includes/money.php';
+header('Cache-Control: no-store, private');
 $types = ['scholarship' => 'Scholarship', 'medical_aid' => 'Medical aid', 'loan' => 'Loan'];
 $requests = [];
 $error = '';
@@ -29,12 +31,13 @@ $success = $_SESSION['request_success'] ?? '';
 unset($_SESSION['request_success']);
 pageHeader('My requests', $member);
 ?>
-<section class="workspace">
-    <div class="page-heading"><div><p class="eyebrow">MEMBER REQUESTS</p><h1>My requests</h1></div><a class="button-link" href="<?= escapeHtml(appUrl('public/member_request.php')) ?>">New request</a></div>
+<section class="workspace formal-workspace request-tracker">
+    <div class="page-heading"><div><p class="eyebrow">MEMBER SERVICES</p><h1>My formal requests</h1></div><a class="button-link" href="<?= escapeHtml(appUrl('public/member_request.php')) ?>"><?= uiIcon('plus') ?>New request</a></div>
     <?php if ($success): ?><p class="success" role="status"><?= escapeHtml($success) ?></p><?php endif; ?>
     <?php showError($error); ?>
     <?php if (!$requests && !$error): ?><div class="empty-state"><h2>No requests yet</h2><a href="<?= escapeHtml(appUrl('public/member_request.php')) ?>">Submit a request</a></div><?php endif; ?>
-    <?php foreach ($requests as $request):
+    <?php if ($requests && !$error): ?><div class="request-ledger-heading"><h2>Request ledger</h2><span class="muted"><?= $total ?> <?= $total === 1 ? 'request' : 'requests' ?></span></div><?php endif; ?>
+    <?php foreach ($requests as $index => $request):
         $office = ['label' => 'Awaiting guarantors', 'tone' => 'pending'];
         if ($request['office_status'] === 'approved') {
             $office = ['label' => 'Approved', 'tone' => 'approved'];
@@ -46,17 +49,26 @@ pageHeader('My requests', $member);
             $office = ['label' => 'Awaiting office', 'tone' => 'pending'];
         }
     ?>
-    <article class="request-row">
-        <div class="request-heading"><div><h2><?= escapeHtml($types[$request['type']] ?? 'Request') ?> <span class="muted">#<?= (int) $request['id'] ?></span></h2><time class="muted"><?= escapeHtml($request['created_at']) ?></time></div><strong class="request-amount"><?= $request['amount_requested'] !== null ? 'INR ' . escapeHtml(number_format((float) $request['amount_requested'], 2)) : 'Amount not specified' ?></strong></div>
-        <p class="request-description"><?= escapeHtml($request['description']) ?></p>
-        <dl class="request-statuses">
+    <details class="tracked-request"<?= $index === 0 ? ' open' : '' ?>>
+        <summary class="tracked-summary">
+            <span class="tracked-identity"><small>REQUEST #<?= (int) $request['id'] ?></small><strong><?= escapeHtml($types[$request['type']] ?? 'Request') ?></strong><time><?= escapeHtml($request['created_at']) ?></time></span>
+            <?php $requestAmount = $request['amount_requested'] !== null ? moneyToCents((string) $request['amount_requested'], true) : null; ?>
+            <strong class="tracked-amount"><?= $requestAmount !== null ? escapeHtml(formatMoney($requestAmount)) : 'Amount unavailable' ?></strong>
+            <span class="status-badge status-<?= $office['tone'] ?>"><?= $office['label'] ?></span><?= uiIcon('chevron-right', 'tracked-chevron') ?>
+        </summary>
+        <div class="tracked-body"><section aria-label="Verification timeline"><h3>Verification timeline</h3>
+        <dl class="request-timeline">
+            <div class="timeline-approved"><dt>Request submitted</dt><dd><?= escapeHtml($request['created_at']) ?></dd></div>
             <?php foreach ([1, 2] as $slot): $status = $request['guarantor' . $slot . '_status']; $status = in_array($status, ['pending', 'approved', 'rejected'], true) ? $status : 'pending'; ?>
-            <div><dt>Guarantor <?= $slot ?></dt><dd><span class="guarantor-name"><?= escapeHtml($request['guarantor' . $slot . '_name'] ?? 'Not assigned') ?></span><span class="status-badge status-<?= $status ?>"><?= ucfirst($status) ?></span></dd><?php if ($request['guarantor' . $slot . '_notes']): ?><p class="guarantor-notes"><?= escapeHtml($request['guarantor' . $slot . '_notes']) ?></p><?php endif; ?></div>
+            <div class="timeline-<?= $status ?>"><dt>Guarantor <?= $slot ?> review</dt><dd><span class="guarantor-name"><?= escapeHtml($request['guarantor' . $slot . '_name'] ?? 'Not assigned') ?></span><span class="status-badge status-<?= $status ?>"><?= ucfirst($status) ?></span><?php if ($request['guarantor' . $slot . '_notes']): ?><p class="guarantor-notes"><?= escapeHtml($request['guarantor' . $slot . '_notes']) ?></p><?php endif; ?></dd></div>
             <?php endforeach; ?>
-            <div><dt>Office status</dt><dd><span class="status-badge status-<?= $office['tone'] ?>"><?= $office['label'] ?></span></dd></div>
+            <?php $officeStatus = in_array($request['office_status'], ['approved', 'rejected'], true) ? $request['office_status'] : 'pending'; ?>
+            <div class="timeline-<?= $officeStatus ?>"><dt>Office review</dt><dd><span class="status-badge status-<?= $officeStatus ?>"><?= ucfirst($officeStatus) ?></span><?php if ($officeStatus === 'pending'): ?><p class="muted"><?= $office['label'] === 'Guarantor rejected' ? 'A guarantor rejected this request.' : ($office['label'] === 'Awaiting office' ? 'Awaiting the office decision.' : 'Awaiting both guarantor approvals.') ?></p><?php endif; ?></dd></div>
         </dl>
-        <?php if ($request['document_path']): ?><a class="document-link" href="<?= escapeHtml(appUrl('public/request_document.php?id=' . (int) $request['id'])) ?>"><img src="<?= escapeHtml(appUrl('assets/icons/download.svg')) ?>" width="18" height="18" alt="">Download document</a><?php endif; ?>
-    </article>
+        </section><aside class="tracked-dossier" aria-label="Request dossier"><p class="eyebrow">REQUEST DOSSIER</p><h3>Purpose of request</h3><p class="tracked-description"><?= escapeHtml($request['description']) ?></p><a class="document-link" href="<?= escapeHtml(appUrl('public/request_details.php?id=' . (int) $request['id'])) ?>"><?= uiIcon('folder') ?>Details and documents<?= uiIcon('arrow-up-right') ?></a>
+        <?php if ($request['document_path']): ?><a class="document-link" href="<?= escapeHtml(appUrl('public/request_document.php?id=' . (int) $request['id'])) ?>"><?= uiIcon('download') ?>Download document</a><?php endif; ?>
+        </aside></div>
+    </details>
     <?php endforeach; ?>
     <?php if ($pages > 1 && !$error): ?><nav class="pagination" aria-label="Request pages"><span>Page <?= $page ?> of <?= $pages ?></span><?php foreach ([-1 => 'Previous page', 1 => 'Next page'] as $direction => $label): $destination = $page + $direction; if ($destination >= 1 && $destination <= $pages): ?><a class="icon-link" title="<?= $label ?>" aria-label="<?= $label ?>" href="<?= escapeHtml(appUrl('public/my_requests.php?page=' . $destination)) ?>"><img src="<?= escapeHtml(appUrl('assets/icons/chevron-' . ($direction < 0 ? 'left' : 'right') . '.svg')) ?>" width="20" height="20" alt=""></a><?php endif; endforeach; ?></nav><?php endif; ?>
 </section>

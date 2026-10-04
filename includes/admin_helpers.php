@@ -36,7 +36,6 @@ function adminPageStart(string $title, array $staff): void
     echo '<div class="admin-header">';
     echo '<div><p class="eyebrow">ADMIN</p><h1>' . escapeHtml($title) . '</h1></div>';
     echo '</div>';
-    adminNav();
 }
 
 function adminPageEnd(): void

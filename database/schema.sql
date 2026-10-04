@@ -213,7 +213,7 @@ INSERT INTO staff_users (full_name, username, password_hash, role, area, is_guar
 
 -- ============================================================
 -- REQUESTS (Scholarship / Medical Aid / Loan)
--- Member selects TWO guarantors (admin-approved volunteers).
+-- Member selects TWO same-area guarantors (active CC members or approved volunteers).
 -- BOTH must approve before the office can give final approval.
 -- ============================================================
 CREATE TABLE requests (
@@ -223,6 +223,14 @@ CREATE TABLE requests (
     description TEXT NOT NULL,
     amount_requested DECIMAL(10,2),
     document_path VARCHAR(255),
+    education_grade VARCHAR(60),
+    school_name VARCHAR(150),
+    last_exam_marks DECIMAL(7,2),
+    last_exam_total DECIMAL(7,2),
+    medical_title VARCHAR(150),
+    medical_details TEXT,
+    due_date DATE,
+    medical_confirmation TINYINT(1) NOT NULL DEFAULT 0,
     guarantor1_id INT,
     guarantor1_status ENUM('pending','approved','rejected') DEFAULT 'pending',
     guarantor1_notes TEXT,
@@ -235,6 +243,19 @@ CREATE TABLE requests (
     FOREIGN KEY (guarantor1_id) REFERENCES staff_users(id),
     FOREIGN KEY (guarantor2_id) REFERENCES staff_users(id)
 );
+
+CREATE TABLE request_documents (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    request_id INT NOT NULL,
+    document_type ENUM('exam_result','medical_report','treatment_plan','cost_estimate','other') NOT NULL,
+    original_name VARCHAR(255) NOT NULL,
+    stored_path VARCHAR(255) NOT NULL,
+    mime_type VARCHAR(50) NOT NULL,
+    file_size INT UNSIGNED NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    INDEX idx_request_documents_request_type (request_id, document_type),
+    CONSTRAINT fk_request_documents_request FOREIGN KEY (request_id) REFERENCES requests(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- Dummy requests, each with both guarantor slots filled (volunteer1 + volunteer2)
 INSERT INTO requests (member_id, type, description, amount_requested, guarantor1_id, guarantor2_id)

@@ -2,6 +2,7 @@
 config.php
 .env
 *.local.php
+jamaat-helpdesk/
 
 # Keep planning and task documents local.
 *.md

@@ -1,7 +1,11 @@
 Options -Indexes
 
-<FilesMatch "(?i)^(config(?:\.example)?\.php|.*\.(?:sql|md|env|log))$">
+<FilesMatch "(?i)^(config(?:\.example)?\.php|ai\.example\.php|.*\.(?:sql|md|env|log))$">
     Require all denied
 </FilesMatch>
 
-RedirectMatch 403 /(?:docs|includes|tools|uploads|\.git)(?:/|$)
+RedirectMatch 403 /(?:docs|includes|tools|uploads|jamaat-helpdesk|\.git)(?:/|$)
+
+<FilesMatch "(?i)\.local\.php$">
+    Require all denied
+</FilesMatch>

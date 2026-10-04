@@ -1,3 +1,3 @@
 <?php
 require_once __DIR__ . '/includes/bootstrap.php';
-redirectTo('public/login.php');
+redirectTo('public/guest_chat.php');

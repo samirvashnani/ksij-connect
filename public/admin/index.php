@@ -4,6 +4,7 @@ require_once dirname(__DIR__, 2) . '/includes/admin_helpers.php';
 require_once dirname(__DIR__, 2) . '/includes/admin_context.php';
 
 $staff = requireRole('admin');
+header('Cache-Control: no-store');
 $pdo = getDb();
 
 $overview = [
@@ -28,7 +29,7 @@ adminPageStart('dashboard', $staff);
 
 <div class="admin-grid two-columns">
     <section class="admin-card">
-        <h2>Quick admin context</h2>
+        <h2>Office summary</h2>
         <ul class="context-list">
             <?php foreach ($context['snippets'] as $snippet): ?>
                 <li>
@@ -40,14 +41,14 @@ adminPageStart('dashboard', $staff);
         </ul>
     </section>
     <section class="admin-card">
-        <h2>Admin tools</h2>
+        <h2>Quick actions</h2>
         <div class="tool-list">
-            <a class="tool-link" href="<?= escapeHtml(appUrl('public/admin/events.php')) ?>">Manage Events</a>
-            <a class="tool-link" href="<?= escapeHtml(appUrl('public/admin/members.php')) ?>">Manage Members</a>
-            <a class="tool-link" href="<?= escapeHtml(appUrl('public/admin/staff_users.php')) ?>">Manage Staff</a>
-            <a class="tool-link" href="<?= escapeHtml(appUrl('public/admin/requests_overview.php')) ?>">Review Requests</a>
-            <a class="tool-link" href="<?= escapeHtml(appUrl('public/admin/funds_approval.php')) ?>">Approve Funds</a>
-            <a class="tool-link" href="<?= escapeHtml(appUrl('public/admin/help_requests_assign.php')) ?>">Assign Help Requests</a>
+            <a class="tool-link" href="<?= escapeHtml(appUrl('public/admin/events.php')) ?>">Manage events <?= uiIcon('arrow-up-right') ?></a>
+            <a class="tool-link" href="<?= escapeHtml(appUrl('public/admin/members.php')) ?>">Manage members <?= uiIcon('arrow-up-right') ?></a>
+            <a class="tool-link" href="<?= escapeHtml(appUrl('public/admin/staff_users.php')) ?>">Manage team <?= uiIcon('arrow-up-right') ?></a>
+            <a class="tool-link" href="<?= escapeHtml(appUrl('public/admin/requests_overview.php')) ?>">Review requests <?= uiIcon('arrow-up-right') ?></a>
+            <a class="tool-link" href="<?= escapeHtml(appUrl('public/admin/funds_approval.php')) ?>">Approve funds <?= uiIcon('arrow-up-right') ?></a>
+            <a class="tool-link" href="<?= escapeHtml(appUrl('public/admin/help_requests_assign.php')) ?>">Assign help requests <?= uiIcon('arrow-up-right') ?></a>
         </div>
     </section>
 </div>

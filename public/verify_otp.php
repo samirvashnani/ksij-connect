@@ -1,5 +1,6 @@
 <?php
 require_once dirname(__DIR__) . '/includes/layout.php';
+require_once dirname(__DIR__) . '/includes/member_access.php';
 if (empty($_SESSION['pending_otp'])) {
     redirectTo('public/login.php');
 }
@@ -51,9 +52,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 pageHeader('Verify membership');
 ?>
-<section class="auth"><p class="eyebrow">MEMBER PORTAL</p><h1>Verify your code</h1><p class="intro">Membership <?= escapeHtml($_SESSION['pending_otp']['membership_id']) ?>. Your code expires in five minutes.</p>
+<?php memberAccessStart(2); ?>
+<div class="member-verification-id"><span>Membership ID</span><strong><?= escapeHtml($_SESSION['pending_otp']['membership_id']) ?></strong><a href="<?= escapeHtml(appUrl('public/login.php')) ?>">Change</a></div>
 <?php if (defined('OTP_TEST_MODE') && OTP_TEST_MODE && isset($_SESSION['test_otp'])): ?><p class="notice">Development code: <strong><?= escapeHtml($_SESSION['test_otp']) ?></strong></p><?php endif; ?>
 <?php showError($error); ?>
-<form method="post"><?php csrfField(); ?><label for="otp">Verification code</label><input id="otp" name="otp" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{6}" maxlength="6" required><button type="submit">Sign in</button></form>
-<a class="secondary-link" href="<?= escapeHtml(appUrl('public/login.php')) ?>">Request a new code</a></section>
+<form method="post" data-member-access-form><?php csrfField(); ?><label for="otp">Six-digit verification code</label><input id="otp" name="otp" data-otp-code inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{6}" maxlength="6" aria-describedby="otp-note" required><p class="member-access-note" id="otp-note">Codes expire five minutes after they are sent.</p><button type="submit">Verify and continue <?= uiIcon('arrow-up-right') ?></button></form>
+<a class="member-resend" href="<?= escapeHtml(appUrl('public/login.php')) ?>">Request a new code</a>
+<?php memberAccessEnd(); ?>
 <?php pageFooter(); ?>

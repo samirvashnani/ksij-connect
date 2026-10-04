@@ -1,5 +1,6 @@
 <?php
 require_once dirname(__DIR__) . '/includes/layout.php';
+require_once dirname(__DIR__) . '/includes/member_access.php';
 $error = '';
 $membershipId = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -48,8 +49,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 pageHeader('Member login');
 ?>
-<section class="auth"><p class="eyebrow">MEMBER PORTAL</p><h1>Member login</h1><p class="intro">Sign in with your membership ID.</p>
+<?php memberAccessStart(1); ?>
 <?php showError($error); ?>
-<form method="post"><?php csrfField(); ?><label for="membership_id">Membership ID</label><input id="membership_id" name="membership_id" value="<?= escapeHtml($membershipId) ?>" maxlength="20" autocomplete="username" placeholder="KSIJ001" required><button type="submit">Continue</button></form>
-</section>
+<form method="post" data-member-access-form><?php csrfField(); ?><label for="membership_id">Jamaat membership ID</label><input id="membership_id" name="membership_id" value="<?= escapeHtml($membershipId) ?>" maxlength="20" autocomplete="username" autocapitalize="characters" spellcheck="false" aria-describedby="membership-note"<?= $error ? ' aria-invalid="true"' : '' ?> required><p class="member-access-note" id="membership-note">Your ID is on your membership card or office receipt.</p><button type="submit">Send verification code <?= uiIcon('arrow-up-right') ?></button></form>
+<?php memberAccessEnd(); ?>
 <?php pageFooter(); ?>

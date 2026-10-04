@@ -67,7 +67,7 @@ $statusLabels = ['pending_approval' => 'Awaiting office approval', 'active' => '
 pageHeader($fundId || $isStaff ? 'Fund documents' : 'My funds', $identity, $isStaff);
 ?>
 <section class="workspace">
-    <div class="page-heading"><div><p class="eyebrow">PRIVATE FUND RECORDS</p><h1><?= $fundId || $isStaff ? 'Fund documents' : 'My funds' ?></h1></div><a href="<?= escapeHtml(appUrl($isStaff ? 'public/admin/index.php' : 'public/raise_fund.php')) ?>"><?= $isStaff ? 'Admin workspace' : 'Raise a medical fund' ?></a></div>
+    <div class="page-heading"><div><p class="eyebrow">PRIVATE FUND RECORDS</p><h1><?= $fundId || $isStaff ? 'Fund documents' : 'My funds' ?></h1></div><a href="<?= escapeHtml(appUrl($isStaff ? 'public/admin/index.php' : 'public/funds_board.php')) ?>"><?= $isStaff ? 'Admin workspace' : 'Medical funds' ?></a></div>
     <?php if ($success): ?><p class="success" role="status"><?= escapeHtml($success) ?></p><?php endif; ?>
     <?php showError($error); ?>
     <?php if ($fund && !$error): $target = moneyToCents((string) $fund['amount_needed']); ?>

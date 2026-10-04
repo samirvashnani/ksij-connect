@@ -60,7 +60,7 @@ renderAdminMessages($success, $error);
                     <?php $canOfficeDecision = $row['guarantor1_status'] === 'approved' && $row['guarantor2_status'] === 'approved'; ?>
                     <tr>
                         <td><?= escapeHtml($row['member_name']) ?> (<?= escapeHtml($row['membership_id']) ?>)</td>
-                        <td><?= escapeHtml(str_replace('_', ' ', $row['type'])) ?></td>
+                        <td><?= escapeHtml(str_replace('_', ' ', $row['type'])) ?><br><a href="<?= escapeHtml(appUrl('public/request_details.php?id=' . (int) $row['id'])) ?>">Details and documents</a></td>
                         <td><?= escapeHtml(formatMoney($row['amount_requested'])) ?></td>
                         <td><?= escapeHtml($row['guarantor1_name'] ?: '—') ?><br><small><?= escapeHtml($row['guarantor1_status'] ?: 'pending') ?></small></td>
                         <td><?= escapeHtml($row['guarantor2_name'] ?: '—') ?><br><small><?= escapeHtml($row['guarantor2_status'] ?: 'pending') ?></small></td>

@@ -29,7 +29,7 @@ unset($_SESSION['fund_success']);
 pageHeader('Medical funds', $member);
 ?>
 <section class="workspace">
-    <div class="page-heading"><div><p class="eyebrow">MEDICAL SUPPORT</p><h1>Medical funds</h1></div><div class="form-actions"><a href="<?= escapeHtml(appUrl('public/fund_documents.php')) ?>">My funds</a><a class="button-link" href="<?= escapeHtml(appUrl('public/raise_fund.php')) ?>">Raise a medical fund</a></div></div>
+    <div class="page-heading"><div><p class="eyebrow">MEDICAL SUPPORT</p><h1>Medical funds</h1></div><a href="<?= escapeHtml(appUrl('public/fund_documents.php')) ?>">My funds</a></div>
     <?php if ($success): ?><p class="success" role="status"><?= escapeHtml($success) ?></p><?php endif; ?>
     <?php showError($error); ?>
     <?php if (!$funds && !$error): ?><div class="empty-state"><h2>No active medical funds</h2></div><?php endif; ?>
