@@ -101,6 +101,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     createNotification('staff', $guarantorId, 'Guarantor approval requested', 'Request #' . $requestId . ' requires your review.');
                 }
                 notifyAdminsOfNewRequest($requestId, $types[$values['type']], $member['full_name']);
+
                 $pdo->commit();
                 unset($_SESSION['request_submission_token']);
                 $_SESSION['request_success'] = 'Request #' . $requestId . ' submitted successfully.';

@@ -2,6 +2,7 @@
 require_once dirname(__DIR__) . '/includes/auth_member.php';
 require_once dirname(__DIR__) . '/includes/layout.php';
 require_once dirname(__DIR__) . '/includes/notifications.php';
+
 $member = requireMember();
 $categories = ['elderly_help' => 'Elderly help', 'urgent_medical' => 'Urgent medical', 'other' => 'Other'];
 $category = '';
@@ -31,6 +32,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $helpRequestId = (int) $pdo->lastInsertId();
             notifyAdminsOfNewRequest($helpRequestId, $categories[$category], $member['full_name']);
             $pdo->commit();
+
             unset($_SESSION['help_submission_token']);
             $_SESSION['help_success'] = 'Help request #' . $helpRequestId . ' submitted successfully.';
             redirectTo('public/help_requests_list.php');
@@ -38,6 +40,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if ($pdo->inTransaction()) {
                 $pdo->rollBack();
             }
+
             error_log('Help request submission failed: ' . $exception->getMessage());
             $errors[] = 'Your help request could not be saved. Please try again.';
         }
